@@ -1,7 +1,7 @@
 // Terminal CD frontend
 // Terminal http-server
 
-const contractAddress = '0xca547c7a23de485d2ed8e29cc3ef38dfcd5d34e7'; // Replace with your contract address
+const contractAddress = '0x66e196568408a02a0a23f63751b8f115b3136e1d'; // Replace with your contract address
 
 let web3, contract, accounts, abi;
 
