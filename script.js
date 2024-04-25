@@ -273,9 +273,10 @@ async function displayStakeList(stakeList) {
       table.appendChild(row);
     }
   
+    stakeListElement.appendChild(table);
+
     // Remove the spinner and append the table to the stakeListElement
     stakeListSpinner.style.display = 'none';
-    stakeListElement.appendChild(table);
 }
   
   
