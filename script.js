@@ -173,9 +173,8 @@ async function displayStakeList(stakeList) {
     }
 
     // Create and show the spinner
-    const spinner = document.createElement('div');
-    spinner.className = 'spinner';
-    stakeListElement.appendChild(spinner);
+    const stakeListSpinner = document.getElementById('stakeListSpinner');
+    stakeListSpinner.style.display = 'block';
     
     const table = document.createElement('table');
     const headerRow = document.createElement('tr');
@@ -275,7 +274,7 @@ async function displayStakeList(stakeList) {
     }
   
     // Remove the spinner and append the table to the stakeListElement
-    stakeListElement.innerHTML = '';
+    stakeListSpinner.style.display = 'none';
     stakeListElement.appendChild(table);
 }
   
