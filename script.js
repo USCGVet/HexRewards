@@ -171,7 +171,12 @@ async function displayStakeList(stakeList) {
       stakeListElement.innerHTML = '<p>No stakes found.</p>';
       return;
     }
-  
+
+    // Create and show the spinner
+    const spinner = document.createElement('div');
+    spinner.className = 'spinner';
+    stakeListElement.appendChild(spinner);
+    
     const table = document.createElement('table');
     const headerRow = document.createElement('tr');
     const headers = ['Stake ID', 'Staked Hearts', 'Stake Shares', 'Locked Day', 'Staked Days', 'Unlocked Day', 'Auto Stake', 'Consumed Days', 'Early Reward', 'Finished Reward', 'Claimed Reward', 'Register', 'Claim Reward', 'Return Reward'];
@@ -269,6 +274,8 @@ async function displayStakeList(stakeList) {
       table.appendChild(row);
     }
   
+    // Remove the spinner and append the table to the stakeListElement
+    stakeListElement.innerHTML = '';
     stakeListElement.appendChild(table);
 }
   
