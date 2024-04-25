@@ -191,7 +191,8 @@ async function displayStakeList(stakeList) {
     for (let i = 0; i < stakeList.length; i++) {
       const stake = stakeList[i];
       const consumedDays = await contract.methods.calculateConsumedDays(stake.lockedDay, stake.stakedDays).call();
-  
+      stakeListSpinner.style.display = 'block';
+
       let claimedReward, earlyReward, finishedReward;
       try {
         claimedReward = await contract.methods.getClaimedReward(accounts[0], parseInt(i)).call();
@@ -203,7 +204,8 @@ async function displayStakeList(stakeList) {
         earlyReward = '0';
         finishedReward = '0';
       }
-  
+      stakeListSpinner.style.display = 'block';
+
       const row = document.createElement('tr');
       const values = [
         stake.stakeId,
@@ -224,13 +226,15 @@ async function displayStakeList(stakeList) {
         td.textContent = value;
         row.appendChild(td);
       });
-  
+      stakeListSpinner.style.display = 'block';
+
       // Register button logic
       const registerTd = document.createElement('td');
       const isStakeRegistered = await contract.methods.isStakeRegistered(stake.stakeId).call();
       const tierIndex = await contract.methods.determineTier(stake.stakedHearts).call();
       const tierStakesCount = await contract.methods.tierStakesCount(tierIndex).call();
       let registerButtonDisplayed = false; // Flag to track if register button is displayed
+      stakeListSpinner.style.display = 'block';
 
       if (!isStakeRegistered && stake.stakeId > await contract.methods.STAKEID_PROTECTION().call() && tierStakesCount < 100) {
         const registerButton = document.createElement('button');
@@ -243,7 +247,7 @@ async function displayStakeList(stakeList) {
         registerButtonDisplayed = true; // Set flag to true if button is added
       }
       row.appendChild(registerTd);
-  
+      stakeListSpinner.style.display = 'block';
       // Claim button logic
       const claimTd = document.createElement('td');
       if (!registerButtonDisplayed && claimedReward.toString() === '0') {
@@ -255,7 +259,7 @@ async function displayStakeList(stakeList) {
         claimTd.appendChild(claimButton);
       }
       row.appendChild(claimTd);
-  
+      stakeListSpinner.style.display = 'block';
       // Return button logic
       const returnTd = document.createElement('td');
       if (!registerButtonDisplayed && claimedReward.toString() !== '0') {
@@ -269,7 +273,8 @@ async function displayStakeList(stakeList) {
         returnTd.appendChild(returnButton);
       }
       row.appendChild(returnTd);
-  
+      stakeListSpinner.style.display = 'block';
+
       table.appendChild(row);
     }
   
