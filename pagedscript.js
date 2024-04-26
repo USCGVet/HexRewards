@@ -294,14 +294,12 @@ async function displayStakeList(stakeList) {
     });
 
     stakeListElement.appendChild(table);
-
-    // Remove the spinner
-    stakeListSpinner.style.display = 'none';
-
+    stakeListSpinner.style.display = 'block';
+    
     // Create pagination buttons
     const paginationElement = document.createElement('div');
     paginationElement.classList.add('pagination');
-
+    stakeListSpinner.style.display = 'block';
     for (let i = 1; i <= totalPages; i++) {
       const button = document.createElement('button');
       button.textContent = i;
@@ -310,12 +308,17 @@ async function displayStakeList(stakeList) {
         button.classList.add('active');
       }
       paginationElement.appendChild(button);
+      stakeListSpinner.style.display = 'block';
     }
 
     stakeListElement.appendChild(paginationElement);
+    stakeListSpinner.style.display = 'block';
   }
 
   showPage(currentPage);
+
+  // Remove the spinner and append the table to the stakeListElement
+  stakeListSpinner.style.display = 'none';
 }
   
   
