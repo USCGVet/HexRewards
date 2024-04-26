@@ -324,6 +324,7 @@ async function displayStakeList(stakeList) {
         registerButton.addEventListener('click', async () => {
           await contract.methods.claimStake(startIndex + index).send({ from: accounts[0] });
           await getStakeList();
+          await displayRemainingSeats();
         });
         registerTd.appendChild(registerButton);
         registerButtonDisplayed = true;
