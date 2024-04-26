@@ -162,7 +162,7 @@ async function getRemainingSeats() {
         const remainingSeats = [];
         for (let i = 0; i < 9; i++) {
             const tierCount = await contract.methods.tierStakesCount(i).call();
-            remainingSeats.push(MAX_STAKES_PER_TIER - tierCount);
+            remainingSeats.push(MAX_STAKES_PER_TIER - Number(tierCount));
         }
         return remainingSeats;
     } catch (error) {
