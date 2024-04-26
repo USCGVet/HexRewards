@@ -3,6 +3,7 @@
 // Terminal http-server
 
 const contractAddress = '0xcfcb89f00576a775d9f81961a37ba7dcf12c7d9b'; // Replace with your contract address
+const MAX_STAKES_PER_TIER = 369;
 
 let web3, contract, accounts, abi;
 
@@ -34,6 +35,7 @@ async function connectToMetaMask() {
 
       await getNetwork();
       await getStakeList();
+      await displayRemainingSeats();
 
       // Store the connection status in localStorage
       localStorage.setItem('isMetaMaskConnected', 'true');
@@ -191,23 +193,44 @@ async function displayRemainingSeats() {
     tierListElement.innerHTML = '';
 
     const remainingSeats = await getRemainingSeats();
+    const tierRanges = [
+        '1,000 - 9,999',
+        '10,000 - 99,999',
+        '100,000 - 999,999',
+        '1,000,000 - 9,999,999',
+        '10,000,000 - 99,999,999',
+        '100,000,000 - 999,999,999',
+        '1,000,000,000 - 9,999,999,999',
+        '10,000,000,000 - 99,999,999,999',
+        '100,000,000,000+'
+    ];
+
     const remainingSeatsElement = document.createElement('table');
-    remainingSeatsElement.classList.add('remaining-seats');
+    remainingSeatsElement.classList.add('tier-info');
     const headerRow = document.createElement('tr');
-    const headers = ['Tier 0', 'Tier 1', 'Tier 2', 'Tier 3', 'Tier 4', 'Tier 5', 'Tier 6', 'Tier 7', 'Tier 8'];
+    const headers = ['Tier', 'Hex Range', 'Seats Left'];
     headers.forEach(header => {
         const th = document.createElement('th');
         th.textContent = header;
         headerRow.appendChild(th);
     });
     remainingSeatsElement.appendChild(headerRow);
-    const seatsRow = document.createElement('tr');
-    remainingSeats.forEach(seats => {
-        const td = document.createElement('td');
-        td.textContent = seats;
-        seatsRow.appendChild(td);
-    });
-    remainingSeatsElement.appendChild(seatsRow);
+
+    for (let i = 0; i < 9; i++) {
+        const tierRow = document.createElement('tr');
+        const tierCell = document.createElement('td');
+        tierCell.textContent = `Tier ${i}`;
+        const rangeCell = document.createElement('td');
+        rangeCell.textContent = tierRanges[i];
+        const seatsCell = document.createElement('td');
+        seatsCell.textContent = remainingSeats[i];
+
+        tierRow.appendChild(tierCell);
+        tierRow.appendChild(rangeCell);
+        tierRow.appendChild(seatsCell);
+        remainingSeatsElement.appendChild(tierRow);
+    }
+
     tierListElement.appendChild(remainingSeatsElement);
 }
 
