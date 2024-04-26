@@ -187,8 +187,11 @@ async function displayStakeList(stakeList) {
     stakeListElement.innerHTML = '';
 
     // Create and show the spinner
+    const spinnerContent = document.getElementById('spinnerContent');
+    spinnerContent.style.display = 'block';
     const stakeListSpinner = document.getElementById('stakeListSpinner');
     stakeListSpinner.style.display = 'block';
+      
 
     const table = document.createElement('table');
     const headerRow = document.createElement('tr');
@@ -319,6 +322,7 @@ async function displayStakeList(stakeList) {
 
   // Remove the spinner and append the table to the stakeListElement
   stakeListSpinner.style.display = 'none';
+  spinnerContent.style.display = 'none';
 }
   
   
