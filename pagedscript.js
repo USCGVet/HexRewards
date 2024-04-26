@@ -177,7 +177,7 @@ async function displayStakeList(stakeList) {
 
   let currentPage = 1;
 
-  function showPage(page) {
+  async function showPage(page) {
     currentPage = page;
     const startIndex = (page - 1) * stakesPerPage;
     const endIndex = startIndex + stakesPerPage;
@@ -191,7 +191,6 @@ async function displayStakeList(stakeList) {
     spinnerContent.style.display = 'block';
     const stakeListSpinner = document.getElementById('stakeListSpinner');
     stakeListSpinner.style.display = 'block';
-      
 
     const table = document.createElement('table');
     const headerRow = document.createElement('tr');
@@ -205,9 +204,8 @@ async function displayStakeList(stakeList) {
 
     table.appendChild(headerRow);
 
-    stakesToShow.forEach(async (stake, index) => {
+    const rowPromises = stakesToShow.map(async (stake, index) => {
       const consumedDays = await contract.methods.calculateConsumedDays(stake.lockedDay, stake.stakedDays).call();
-      stakeListSpinner.style.display = 'block';
 
       let claimedReward, earlyReward, finishedReward;
       try {
@@ -220,7 +218,6 @@ async function displayStakeList(stakeList) {
         earlyReward = '0';
         finishedReward = '0';
       }
-      stakeListSpinner.style.display = 'block';
 
       const row = document.createElement('tr');
       const values = [
@@ -242,7 +239,6 @@ async function displayStakeList(stakeList) {
         td.textContent = value;
         row.appendChild(td);
       });
-      stakeListSpinner.style.display = 'block';
 
       // Register button logic
       const registerTd = document.createElement('td');
@@ -250,7 +246,6 @@ async function displayStakeList(stakeList) {
       const tierIndex = await contract.methods.determineTier(stake.stakedHearts).call();
       const tierStakesCount = await contract.methods.tierStakesCount(tierIndex).call();
       let registerButtonDisplayed = false;
-      stakeListSpinner.style.display = 'block';
 
       if (!isStakeRegistered && stake.stakeId > await contract.methods.STAKEID_PROTECTION().call() && tierStakesCount < 100) {
         const registerButton = document.createElement('button');
@@ -263,7 +258,6 @@ async function displayStakeList(stakeList) {
         registerButtonDisplayed = true;
       }
       row.appendChild(registerTd);
-      stakeListSpinner.style.display = 'block';
 
       // Claim button logic
       const claimTd = document.createElement('td');
@@ -276,7 +270,6 @@ async function displayStakeList(stakeList) {
         claimTd.appendChild(claimButton);
       }
       row.appendChild(claimTd);
-      stakeListSpinner.style.display = 'block';
 
       // Return button logic
       const returnTd = document.createElement('td');
@@ -291,18 +284,19 @@ async function displayStakeList(stakeList) {
         returnTd.appendChild(returnButton);
       }
       row.appendChild(returnTd);
-      stakeListSpinner.style.display = 'block';
 
-      table.appendChild(row);
+      return row;
     });
 
+    const rows = await Promise.all(rowPromises);
+    rows.forEach(row => table.appendChild(row));
+
     stakeListElement.appendChild(table);
-    stakeListSpinner.style.display = 'block';
-    
+
     // Create pagination buttons
     const paginationElement = document.createElement('div');
     paginationElement.classList.add('pagination');
-    stakeListSpinner.style.display = 'block';
+
     for (let i = 1; i <= totalPages; i++) {
       const button = document.createElement('button');
       button.textContent = i;
@@ -311,20 +305,18 @@ async function displayStakeList(stakeList) {
         button.classList.add('active');
       }
       paginationElement.appendChild(button);
-      stakeListSpinner.style.display = 'block';
     }
 
     stakeListElement.appendChild(paginationElement);
-    stakeListSpinner.style.display = 'block';
+
+    // Remove the spinner after the table is fully populated
+    stakeListSpinner.style.display = 'none';
+    spinnerContent.style.display = 'none';
   }
 
   showPage(currentPage);
-
-  // Remove the spinner and append the table to the stakeListElement
-  stakeListSpinner.style.display = 'none';
-  spinnerContent.style.display = 'none';
 }
-  
+ 
   
   
 async function addTokenToMetaMask() {
