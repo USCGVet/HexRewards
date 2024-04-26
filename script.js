@@ -208,7 +208,7 @@ async function displayRemainingSeats() {
     const remainingSeatsElement = document.createElement('table');
     remainingSeatsElement.classList.add('tier-info');
     const headerRow = document.createElement('tr');
-    const headers = ['Tier', 'Hex Range', 'Seats Left'];
+    const headers = ['Tier', 'Hex Stake Size Range', 'Hex Stakes (Seats) Left to Register'];
     headers.forEach(header => {
         const th = document.createElement('th');
         th.textContent = header;
