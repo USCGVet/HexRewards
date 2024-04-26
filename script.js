@@ -155,6 +155,19 @@ async function returnReward(stakeIndex, amtReturned) {
     }
 }
 
+async function getRemainingSeats() {
+    try {
+        const remainingSeats = [];
+        for (let i = 0; i < 9; i++) {
+            const tierCount = await contract.methods.tierStakesCount(i).call();
+            remainingSeats.push(MAX_STAKES_PER_TIER - tierCount);
+        }
+        return remainingSeats;
+    } catch (error) {
+        console.error('Failed to fetch remaining seats:', error);
+        return [];
+    }
+}
 
 async function getStakeList() {
     console.log('Calling getStakeList function...');
@@ -172,6 +185,31 @@ async function getStakeList() {
       alert('Failed to retrieve stake list. Please check the console for more information.');
     }
   }
+
+async function displayRemainingSeats() {
+    const tierListElement = document.getElementById('tierList');
+    tierListElement.innerHTML = '';
+
+    const remainingSeats = await getRemainingSeats();
+    const remainingSeatsElement = document.createElement('table');
+    remainingSeatsElement.classList.add('remaining-seats');
+    const headerRow = document.createElement('tr');
+    const headers = ['Tier 0', 'Tier 1', 'Tier 2', 'Tier 3', 'Tier 4', 'Tier 5', 'Tier 6', 'Tier 7', 'Tier 8'];
+    headers.forEach(header => {
+        const th = document.createElement('th');
+        th.textContent = header;
+        headerRow.appendChild(th);
+    });
+    remainingSeatsElement.appendChild(headerRow);
+    const seatsRow = document.createElement('tr');
+    remainingSeats.forEach(seats => {
+        const td = document.createElement('td');
+        td.textContent = seats;
+        seatsRow.appendChild(td);
+    });
+    remainingSeatsElement.appendChild(seatsRow);
+    tierListElement.appendChild(remainingSeatsElement);
+}
 
 async function displayStakeList(stakeList) {
   const stakeListElement = document.getElementById('stakeList');
