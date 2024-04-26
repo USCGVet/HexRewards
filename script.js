@@ -18,29 +18,38 @@ async function loadABI() {
 
   
 async function connectToMetaMask() {
-    await loadABI();
+  await loadABI();
 
-    if (typeof window.ethereum !== 'undefined') {
-        web3 = new Web3(window.ethereum);
-        try {
-            accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            contract = new web3.eth.Contract(abi, contractAddress);
-            document.getElementById('accountInfo').innerHTML = `Connected: ${accounts[0]}`;            
-            await getTokenBalance(); 
-            document.getElementById('mainContent').style.display = 'block'; // Show the main content
-            document.getElementById('tokenBalanceHeader').style.display = 'block';
-            document.getElementById('connectButton').style.display = 'none';
-            document.getElementById('connectAddr').style.display = 'block';
+  if (typeof window.ethereum !== 'undefined') {
+    web3 = new Web3(window.ethereum);
+    try {
+      accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      contract = new web3.eth.Contract(abi, contractAddress);
+      document.getElementById('accountInfo').innerHTML = `Connected: ${accounts[0]}`;
+      await getTokenBalance();
+      document.getElementById('mainContent').style.display = 'block'; // Show the main content
+      document.getElementById('tokenBalanceHeader').style.display = 'block';
+      document.getElementById('connectButton').style.display = 'none';
+      document.getElementById('connectAddr').style.display = 'block';
 
-            await getNetwork();
-            await getStakeList();
+      await getNetwork();
+      await getStakeList();
 
-        } catch (error) {
-            console.error(error);
-        }
-    } else {
-        alert('Please install MetaMask to interact with this dApp!');
+      // Store the connection status in localStorage
+      localStorage.setItem('isMetaMaskConnected', 'true');
+    } catch (error) {
+      console.error(error);
     }
+  } else {
+    alert('Please install MetaMask to interact with this dApp!');
+  }
+}
+
+async function checkAndConnectToMetaMask() {
+  const isConnected = localStorage.getItem('isMetaMaskConnected');
+  if (isConnected === 'true') {
+    await connectToMetaMask();
+  }
 }
 
 async function getTotalTokenSupply() {
@@ -352,3 +361,6 @@ async function addTokenToMetaMask() {
 
 document.getElementById('connectButton').addEventListener('click', connectToMetaMask);
 document.getElementById('addTokenButton').addEventListener('click', addTokenToMetaMask);
+
+// Call the checkAndConnectToMetaMask function when the page loads
+window.addEventListener('load', checkAndConnectToMetaMask);
