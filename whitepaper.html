@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HexRewards - White Paper</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="favicon.ico?v=3" type="image/x-icon">
+    <style>
+        .whitepaper {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: #1e2233;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .whitepaper h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .whitepaper h2 {
+            font-size: 24px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+        
+        .whitepaper p {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="logo-nobackground-1000.png" alt="HexRewards Logo">
+            <h1>HexRewards</h1>
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="whitepaper.html">White Paper</a>
+            <!-- Add more navigation links as needed -->
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="whitepaper">
+            <h1>HexRewards White Paper</h1>
+            
+            <!-- Paste your white paper content here -->
+            <div class="whitepaper">
+    <h1>HexRewards - A Rewarding Experience for Hex Stakers</h1>
+
+    <h2>Introduction</h2>
+    <p>
+        HexRewards is an innovative smart contract designed to provide additional incentives for Hex stakers. By leveraging the power of the Hex staking system, HexRewards offers a unique opportunity for users to earn additional rewards based on their staking length of time. This white paper will explore the key features and benefits of the HexRewards contract, providing a comprehensive overview for potential users.
+    </p>
+
+    <h2>Stake Claiming</h2>
+    <h3>2.1 Stake ID Protection</h3>
+    <p>
+        To ensure the integrity of the rewarding system, HexRewards implements a stake ID protection mechanism. "New" stakes with an ID greater than the STAKEID_PROTECTION value (817340) are eligible for claiming rewards only after "Registering". This protection helps prevent abuse and ensures that rewards are distributed fairly among genuine stakers. "Old" stakes that have a stake ID lower than or equal to 817340 are eligible for claiming rewards without the need of "Registering" first.
+    </p>
+
+    <h3>2.2 Stake Tiers</h3>
+    <p>
+        HexRewards introduces a tiered system based on the amount of Hex staked for "New" stakes with a stake ID after the STAKEID_PROTECTION value (817340). There are nine tiers, each with a maximum number of stakes allowed (MAX_STAKES_PER_TIER = 369). Users can claim their stake by clicking on the "Register" button on the site which then calls the claimStake function in the contract, providing their stake index. The contract will determine the appropriate tier based on the staked amount and register the stake accordingly consuming one of the available seats or slots of that tier. Once a tier has been consumed, where all the seats are "Registered" for that tier, then no more stakes can be "Registered" for that tier.
+    </p>
+
+    <h2>Reward Calculation</h2>
+    <h3>3.1 Reward Per Day</h3>
+    <p>
+        The contract defines a constant REWARD_PER_DAY, which represents the base reward amount earned per day of staking. The actual reward earned depends on the duration of the stake and whether it is a 5555-day stake or not.
+    </p>
+
+    <h3>3.2 5555-Day Stakes</h3>
+    <p>
+        For stakes with a duration of 5555 days (MAX_STAKE_DAYS), the reward per day is multiplied by a factor of 10 if the stake is still active or has finished all its days. If the 5555 day stake has ended before consuming all the days, the normal reward per day is multiplied by a factor of 10. If the 5555 day stake has finished all 5555 days then the normal reward per day is multiplied by a factor of 100.
+    </p>
+
+    <h3>3.3 Stakes Fewer Than 5555 Days</h3>
+    <p>
+        For stakes with a duration less than 5555 days, the reward per day remains unchanged if the stake is still active. If the stake has ended before consuming all the days, the reward per day stays the same. If the stake has finished all days for the stake, the reward per day is multiplied by a factor of 10.
+    </p>
+
+    <h2>Reward Claiming</h2>
+    <h3>4.1 Claiming Rewards</h3>
+    <p>
+        Users can claim their rewards by calling the claimReward function, providing their stake index. The contract checks if the stake is eligible for rewards and calculates the reward amount based on the consumed days and stake duration. The reward is then minted to the user's address, and the claimed amount is recorded in the claimed mapping.
+    </p>
+
+    <h3>4.2 Returning Rewards</h3>
+    <p>
+        Since rewards are based on time of stake consumed, a user's rewards can be returned to re-claim higher rewards at a later date. Returning rewards also requires that an additional 30% be returned along with the original claim amount as a fee for doing the return. Once returned, the user can now re-claim the stake with the new daily total they have accumulated. If a user decides to return their claimed reward, they can call the returnReward function, specifying the stake index and the amount to be returned. The contract verifies that the user has previously claimed a reward for the specified stake and that the return amount matches the calculated return amount. Upon successful verification, the reward tokens are burned, and a 30% fee is minted to the ZERO_IQ_ADDR address.
+    </p>
+
+    <h2>Stake Data and Utility Functions</h2>
+    <p>
+        The HexRewards contract provides several utility functions to retrieve stake-related data:
+    </p>
+    <ul>
+        <li>stakeDataFetch: Returns the stake data for the contract itself.</li>
+        <li>getClaimedReward: Retrieves the claimed reward amount for a specific user and stake index.</li>
+        <li>getStakeList: Returns an array of HEXStake structs representing the stakes of a given account.</li>
+        <li>getCurrentDay: Retrieves the current day from the Hex contract.</li>
+        <li>calculateConsumedDays: Calculates the number of consumed days based on the locked day and stake duration.</li>
+    </ul>
+
+    <h2>Conclusion</h2>
+    <p>
+        HexRewards offers an exciting opportunity for Hex stakers to earn additional rewards based on their staking activity. With its tiered system, stake protection, and flexible reward calculation, HexRewards aims to incentivize long-term staking and provide a rewarding experience for users. By leveraging the power of smart contracts and the Hex staking system, HexRewards seeks to enhance the value proposition for Hex stakers and contribute to the growth and adoption of the Hex ecosystem.
+    </p>
+</div>
+            <!-- Add more sections and content as needed -->
+
+        </div>
+    </div>
+
+    <footer>
+        <!-- Add your footer content here -->
+    </footer>
+</body>
+</html>
