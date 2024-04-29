@@ -203,3 +203,9 @@ header nav a:hover img {
   text-transform: uppercase;
 }
 
+.stake-index-example {
+  font-size: 16px;
+  color: #ffffff;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
