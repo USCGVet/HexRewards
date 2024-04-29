@@ -167,8 +167,60 @@ async function addTokenToMetaMask() {
       console.error(error);
     }
   }  
-
 async function queryStake() {
+  const stakeIndexInput = document.getElementById('stakeIndexInput');
+  const stakeIndex = parseInt(stakeIndexInput.value);
+
+  if (isNaN(stakeIndex) || stakeIndex < 0) {
+    alert('Please enter a valid stake index.');
+    return;
+  }
+
+  try {
+    const stakeList = await contract.methods.getStakeList(accounts[0]).call();
+    if (stakeIndex >= stakeList.length) {
+      alert('Invalid stake index. Please enter a valid index within the range of your stakes.');
+      return;
+    }
+
+    const stake = stakeList[stakeIndex];
+    const consumedDays = await contract.methods.calculateConsumedDays(stake.lockedDay, stake.stakedDays).call();
+
+    let claimedReward, earlyReward, finishedReward;
+    try {
+      claimedReward = await contract.methods.getClaimedReward(accounts[0], stakeIndex).call();
+      earlyReward = await contract.methods.calculateReward(consumedDays, stake.stakedDays, stake.unlockedDay).call();
+      finishedReward = await contract.methods.calculateReward(stake.stakedDays, stake.stakedDays, 1).call();
+    } catch (error) {
+      console.error('Error retrieving claimed reward:', error);
+      claimedReward = '0';
+      earlyReward = '0';
+      finishedReward = '0';
+    }
+
+    const stakeInfo = `
+      <table>
+        <tr><th>Stake ID</th><td>${stake.stakeId}</td></tr>
+        <tr><th>Staked Hearts</th><td>${stake.stakedHearts}</td></tr>
+        <tr><th>Stake Shares</th><td>${stake.stakeShares}</td></tr>
+        <tr><th>Locked Day</th><td>${stake.lockedDay}</td></tr>
+        <tr><th>Staked Days</th><td>${stake.stakedDays}</td></tr>
+        <tr><th>Unlocked Day</th><td>${stake.unlockedDay}</td></tr>
+        <tr><th>Auto Stake</th><td>${stake.isAutoStake}</td></tr>
+        <tr><th>Consumed Days</th><td>${consumedDays}</td></tr>
+        <tr><th>Early Reward</th><td>${web3.utils.fromWei(earlyReward, 'ether')}</td></tr>
+        <tr><th>Finished Reward</th><td>${web3.utils.fromWei(finishedReward, 'ether')}</td></tr>
+        <tr><th>Claimed Reward</th><td>${web3.utils.fromWei(claimedReward, 'ether')}</td></tr>
+      </table>
+    `;
+
+    document.getElementById('stakeInfo').innerHTML = stakeInfo;
+  } catch (error) {
+    console.error('Error retrieving stake:', error);
+    alert('Failed to retrieve stake. Please check the console for more information.');
+  }
+}
+async function queryStake2() {
   const stakeIndexInput = document.getElementById('stakeIndexInput');
   const stakeIndex = parseInt(stakeIndexInput.value);
 
