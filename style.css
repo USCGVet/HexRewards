@@ -181,12 +181,14 @@ header nav a:hover img {
 
 
 #stakeInfo {
-  margin-top: 20px;
+  display: flex;
+  justify-content: center;
 }
 
 #stakeInfo table {
-  width: 100%;
+  width: auto;
   border-collapse: collapse;
+  margin-top: 20px;
 }
 
 #stakeInfo th,
@@ -201,6 +203,11 @@ header nav a:hover img {
   color: #ffffff;
   font-weight: bold;
   text-transform: uppercase;
+  white-space: nowrap;
+}
+
+#stakeInfo td {
+  white-space: nowrap;
 }
 
 .stake-index-example {
