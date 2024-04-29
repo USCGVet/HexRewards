@@ -30,8 +30,8 @@ async function connectToMetaMask() {
       document.getElementById('connectAddr').style.display = 'block';
 
       await getNetwork();
-      await getStakeList();
-      await displayRemainingSeats();
+      //await getStakeList();
+      //await displayRemainingSeats();
 
       // Store the connection status in localStorage
       localStorage.setItem('isMetaMaskConnected', 'true');
@@ -67,7 +67,7 @@ async function getStakeList() {
 
       const theStakeList = await contract.methods.getStakeList(accounts[0]).call();
       console.log('Stake list retrieved:', theStakeList);
-      displayStakeList(theStakeList);
+      //displayStakeList(theStakeList);
 
       //stakeListSpinner.style.display = 'none';
     } catch (error) {
