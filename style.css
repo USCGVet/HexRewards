@@ -167,3 +167,15 @@ th {
 .pagination button:hover {
   background-color: #5a6fc7;
 }
+
+header nav a img {
+    height: 30px;
+    width: 30px;
+    margin: 0 10px;
+    transition: opacity 0.3s ease-in-out;
+}
+
+header nav a:hover img {
+    opacity: 0.7;
+}
+
