@@ -200,7 +200,59 @@ async function queryStake() {
       </table>
     `;
 
+    // Register button logic
+    const isStakeRegistered = await contract.methods.isStakeRegistered(stake.stakeId).call();
+    const tierIndex = await contract.methods.determineTier(stake.stakedHearts).call();
+    const tierStakesCount = await contract.methods.tierStakesCount(tierIndex).call();
+    let registerButtonDisplayed = false;
+
+    if (!isStakeRegistered && stake.stakeId > await contract.methods.STAKEID_PROTECTION().call() && tierStakesCount < 100) {
+      const registerButton = `<button id="registerButton">Register</button>`;
+      stakeInfo += registerButton;
+      registerButtonDisplayed = true;
+    }
+
+    // Claim button logic
+    if (!registerButtonDisplayed && claimedReward.toString() === '0') {
+      const claimButton = `<button id="claimButton">Claim</button>`;
+      stakeInfo += claimButton;
+    }
+
+    // Return button logic
+    if (!registerButtonDisplayed && claimedReward.toString() !== '0') {
+      const returnButton = `<button id="returnButton">Return + (30% burn fee)</button>`;
+      stakeInfo += returnButton;
+    }
+
     document.getElementById('stakeInfo').innerHTML = stakeInfo;
+
+    // Add click event listeners to the buttons
+    const registerButton = document.getElementById('registerButton');
+    if (registerButton) {
+      registerButton.addEventListener('click', async () => {
+        await contract.methods.claimStake(stakeIndex).send({ from: accounts[0] });
+        await queryStake();
+        await displayRemainingSeats();
+      });
+    }
+
+    const claimButton = document.getElementById('claimButton');
+    if (claimButton) {
+      claimButton.addEventListener('click', async () => {
+        await claimReward(stakeIndex);
+        await queryStake();
+      });
+    }
+
+    const returnButton = document.getElementById('returnButton');
+    if (returnButton) {
+      returnButton.addEventListener('click', async () => {
+        const claimedRewardNumber = Number(claimedReward.toString());
+        const returnAmount = claimedRewardNumber * 1.3;
+        await returnReward(stakeIndex, returnAmount);
+        await queryStake();
+      });
+    }
   } catch (error) {
     console.error('Error retrieving stake:', error);
     alert('Failed to retrieve stake. Please check the console for more information.');
