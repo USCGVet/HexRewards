@@ -163,7 +163,13 @@ async function queryStake() {
   }
 
   try {
-    const stake = await contract.methods.getStakeByIndex(accounts[0], stakeIndex).call();
+    const stakeList = await contract.methods.getStakeList(accounts[0]).call();
+    if (stakeIndex >= stakeList.length) {
+      alert('Invalid stake index. Please enter a valid index within the range of your stakes.');
+      return;
+    }
+
+    const stake = stakeList[stakeIndex];
     const consumedDays = await contract.methods.calculateConsumedDays(stake.lockedDay, stake.stakedDays).call();
 
     let claimedReward, earlyReward, finishedReward;
