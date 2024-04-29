@@ -77,12 +77,12 @@
     <h2>Reward Calculation</h2>
     <h3>3.1 Reward Per Day</h3>
     <p>
-        The contract defines a constant REWARD_PER_DAY, which represents the base reward amount earned per day of staking. The actual reward earned depends on the duration of the stake and whether it is a 5555-day stake or not.
+        The contract defines a constant REWARD_PER_DAY = 0.00001 HXR, which represents the base reward amount earned per day of staking. The actual reward earned depends on the duration of the stake and whether it is a 5555-day stake or not.
     </p>
 
     <h3>3.2 5555-Day Stakes</h3>
     <p>
-        For stakes with a duration of 5555 days (MAX_STAKE_DAYS), the reward per day is multiplied by a factor of 10 if the stake is still active or has finished all its days. If the 5555 day stake has ended before consuming all the days, the normal reward per day is multiplied by a factor of 10. If the 5555 day stake has finished all 5555 days then the normal reward per day is multiplied by a factor of 100.
+        For stakes with a duration of 5555 days (MAX_STAKE_DAYS), the reward per day is multiplied by a factor of 10 if the stake is still active. If the 5555 day stake has ended before consuming all the days, the normal reward per day is multiplied by a factor of 10. If the 5555 day stake has finished all 5555 days then the normal reward per day is multiplied by a factor of 100.
     </p>
 
     <h3>3.3 Stakes Fewer Than 5555 Days</h3>
