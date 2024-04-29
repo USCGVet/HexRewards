@@ -59,7 +59,22 @@ async function getTotalTokenSupply() {
         console.error('Failed to fetch total token supply:', error);
     }
 }
+async function getStakeList() {
+    console.log('Calling getStakeList function...');
+    try {
+      //const stakeListSpinner = document.getElementById('stakeListSpinner');
+      //stakeListSpinner.style.display = 'block';
 
+      const theStakeList = await contract.methods.getStakeList(accounts[0]).call();
+      console.log('Stake list retrieved:', theStakeList);
+      displayStakeList(theStakeList);
+
+      //stakeListSpinner.style.display = 'none';
+    } catch (error) {
+      console.error('Error retrieving stake list:', error);
+      alert('Failed to retrieve stake list. Please check the console for more information.');
+    }
+  }
 async function getTokenBalance() {
     try {
         const tokenAddress = contractAddress; 
