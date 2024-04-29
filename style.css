@@ -179,3 +179,27 @@ header nav a:hover img {
     opacity: 0.7;
 }
 
+
+#stakeInfo {
+  margin-top: 20px;
+}
+
+#stakeInfo table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#stakeInfo th,
+#stakeInfo td {
+  padding: 12px;
+  text-align: left;
+  border: 1px solid #7289da;
+}
+
+#stakeInfo th {
+  background-color: #7289da;
+  color: #ffffff;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
