@@ -233,18 +233,18 @@ async function queryStake() {
 
 async function displayButtons(stake, stakeIndex) {
   let buttonsHTML = '';
-
+   
   // Register button logic
   const isStakeRegistered = await contract.methods.isStakeRegistered(stake.stakeId).call();
   const tierIndex = await contract.methods.determineTier(stake.stakedHearts).call();
   const tierStakesCount = await contract.methods.tierStakesCount(tierIndex).call();
 
-  if (!isStakeRegistered && stake.stakeId > await contract.methods.STAKEID_PROTECTION().call() && tierStakesCount < 100) {
+  if (!isStakeRegistered && stake.stakeId > await contract.methods.STAKEID_PROTECTION().call() && tierStakesCount < 369) {
     buttonsHTML += `<button id="registerButton">Register</button>`;
   }
 
   // Claim button logic
-  const claimedReward = await contract.methods.getClaimedReward(accounts[0], stakeIndex).call();
+  claimedReward = await contract.methods.getClaimedReward(accounts[0], stakeIndex).call();
   if (claimedReward.toString() === '0') {
     buttonsHTML += `<button id="claimButton">Claim</button>`;
   }
@@ -259,15 +259,17 @@ async function displayButtons(stake, stakeIndex) {
   // Add click event listeners to the buttons
   const registerButton = document.getElementById('registerButton');
   if (registerButton) {
+    registerButton.textContent = 'Register';
     registerButton.addEventListener('click', async () => {
       await contract.methods.claimStake(stakeIndex).send({ from: accounts[0] });
       await queryStake();
-      await displayRemainingSeats();
+      
     });
   }
 
   const claimButton = document.getElementById('claimButton');
   if (claimButton) {
+    claimButton.textContent = 'Claim';
     claimButton.addEventListener('click', async () => {
       await claimReward(stakeIndex);
       await queryStake();
@@ -276,6 +278,7 @@ async function displayButtons(stake, stakeIndex) {
 
   const returnButton = document.getElementById('returnButton');
   if (returnButton) {
+    returnButton.textContent = 'Return + (30% burn fee)';
     returnButton.addEventListener('click', async () => {
       const claimedRewardNumber = Number(claimedReward.toString());
       const returnAmount = claimedRewardNumber * 1.3;
@@ -285,112 +288,37 @@ async function displayButtons(stake, stakeIndex) {
   }
 }
 
-
-async function queryStake2() {
-  const stakeIndexInput = document.getElementById('stakeIndexInput');
-  const stakeIndex = parseInt(stakeIndexInput.value);
-
-  if (isNaN(stakeIndex) || stakeIndex < 0) {
-    alert('Please enter a valid stake index.');
-    return;
-  }
-
-  try {
-    const stakeList = await contract.methods.getStakeList(accounts[0]).call();
-    if (stakeIndex >= stakeList.length) {
-      alert('Invalid stake index. Please enter a valid index within the range of your stakes.');
-      return;
-    }
-
-    const stake = stakeList[stakeIndex];
-    const consumedDays = await contract.methods.calculateConsumedDays(stake.lockedDay, stake.stakedDays).call();
-
-    let claimedReward, earlyReward, finishedReward;
+async function claimReward(stakeIndex) {
     try {
-      claimedReward = await contract.methods.getClaimedReward(accounts[0], stakeIndex).call();
-      earlyReward = await contract.methods.calculateReward(consumedDays, stake.stakedDays, stake.unlockedDay).call();
-      finishedReward = await contract.methods.calculateReward(stake.stakedDays, stake.stakedDays, 1).call();
+      await contract.methods.claimReward(stakeIndex).send({ from: accounts[0] });
+      alert('Reward claimed successfully!');
+      await getTokenBalance(); // Refresh token balance in the header
+      
     } catch (error) {
-      console.error('Error retrieving claimed reward:', error);
-      claimedReward = '0';
-      earlyReward = '0';
-      finishedReward = '0';
+      console.error(error);
+      alert('Failed to claim reward. Please check the console for more information.');
     }
-
-    const stakeInfo = `
-      <table>
-        <tr><th>Stake ID</th><td>${stake.stakeId}</td></tr>
-        <tr><th>Staked Hearts</th><td>${stake.stakedHearts}</td></tr>
-        <tr><th>Stake Shares</th><td>${stake.stakeShares}</td></tr>
-        <tr><th>Locked Day</th><td>${stake.lockedDay}</td></tr>
-        <tr><th>Staked Days</th><td>${stake.stakedDays}</td></tr>
-        <tr><th>Unlocked Day</th><td>${stake.unlockedDay}</td></tr>
-        <tr><th>Auto Stake</th><td>${stake.isAutoStake}</td></tr>
-        <tr><th>Consumed Days</th><td>${consumedDays}</td></tr>
-        <tr><th>Early Reward</th><td>${web3.utils.fromWei(earlyReward, 'ether')}</td></tr>
-        <tr><th>Finished Reward</th><td>${web3.utils.fromWei(finishedReward, 'ether')}</td></tr>
-        <tr><th>Claimed Reward</th><td>${web3.utils.fromWei(claimedReward, 'ether')}</td></tr>
-      </table>
-    `;
-
-    // Register button logic
-    const isStakeRegistered = await contract.methods.isStakeRegistered(stake.stakeId).call();
-    const tierIndex = await contract.methods.determineTier(stake.stakedHearts).call();
-    const tierStakesCount = await contract.methods.tierStakesCount(tierIndex).call();
-    let registerButtonDisplayed = false;
-
-    if (!isStakeRegistered && stake.stakeId > await contract.methods.STAKEID_PROTECTION().call() && tierStakesCount < 100) {
-      const registerButton = `<button id="registerButton">Register</button>`;
-      stakeInfo += registerButton;
-      registerButtonDisplayed = true;
-    }
-
-    // Claim button logic
-    if (!registerButtonDisplayed && claimedReward.toString() === '0') {
-      const claimButton = `<button id="claimButton">Claim</button>`;
-      stakeInfo += claimButton;
-    }
-
-    // Return button logic
-    if (!registerButtonDisplayed && claimedReward.toString() !== '0') {
-      const returnButton = `<button id="returnButton">Return + (30% burn fee)</button>`;
-      stakeInfo += returnButton;
-    }
-
-    document.getElementById('stakeInfo').innerHTML = stakeInfo;
-
-    // Add click event listeners to the buttons
-    const registerButton = document.getElementById('registerButton');
-    if (registerButton) {
-      registerButton.addEventListener('click', async () => {
-        await contract.methods.claimStake(stakeIndex).send({ from: accounts[0] });
-        await queryStake();
-        await displayRemainingSeats();
-      });
-    }
-
-    const claimButton = document.getElementById('claimButton');
-    if (claimButton) {
-      claimButton.addEventListener('click', async () => {
-        await claimReward(stakeIndex);
-        await queryStake();
-      });
-    }
-
-    const returnButton = document.getElementById('returnButton');
-    if (returnButton) {
-      returnButton.addEventListener('click', async () => {
-        const claimedRewardNumber = Number(claimedReward.toString());
-        const returnAmount = claimedRewardNumber * 1.3;
-        await returnReward(stakeIndex, returnAmount);
-        await queryStake();
-      });
-    }
-  } catch (error) {
-    console.error('Error retrieving stake:', error);
-    alert('Failed to retrieve stake. Please check the console for more information.');
-  }
 }
+
+async function returnReward(stakeIndex, amtReturned) {
+    const amount = amtReturned;
+    try {
+      const currentBalance = await contract.methods.balanceOf(accounts[0]).call();
+        
+      if (BigInt(currentBalance) > BigInt(amount)) {
+          await contract.methods.returnReward(stakeIndex, amount).send({ from: accounts[0] });
+          alert('Reward returned successfully!');
+          await getTokenBalance(); // Refresh token balance in the header
+          
+      } else {
+          alert('Insufficient balance to return the reward.');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Failed to return reward. Please check the console for more information.');
+    }
+}
+
 
 document.getElementById('connectButton').addEventListener('click', connectToMetaMask);
 document.getElementById('addTokenButton').addEventListener('click', addTokenToMetaMask);
