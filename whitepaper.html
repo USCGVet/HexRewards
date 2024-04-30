@@ -100,7 +100,27 @@
     <p>
         Since rewards are based on time of stake consumed, a user's rewards can be returned to re-claim higher rewards at a later date. Returning rewards also requires that an additional 30% be returned along with the original claim amount as a fee for doing the return. Once returned, the user can now re-claim the stake with the new daily total they have accumulated. If a user decides to return their claimed reward, they can call the returnReward function, specifying the stake index and the amount to be returned. The contract verifies that the user has previously claimed a reward for the specified stake and that the return amount matches the calculated return amount. Upon successful verification, the reward tokens are burned, and a 30% fee is minted to the ZERO_IQ_ADDR address.
     </p>
-
+    <!-- Example of Claiming Rewards for a Standard Stake -->
+    <div class="example">
+        <h3>Example: Claiming Rewards for a Standard Non-5555 Day Stake</h3>
+        <p><strong>Stake Duration:</strong> 1000 days</p>
+        <h4>Initial Claim</h4>
+        <p>You claim rewards at day 500 of your 1000-day stake, receiving 0.005 HXR calculated as follows:</p>
+        <ul>
+            <li><strong>Calculation:</strong> 500 days × 0.00001 HXR/day = 0.005 HXR</li>
+        </ul>
+        <h4>Return Process</h4>
+        <p>To reactivate the claim option, you return 0.0065 HXR (including a 30% fee on the initially claimed rewards):</p>
+        <ul>
+            <li><strong>Calculation:</strong> 0.005 HXR + (30% of 0.005 HXR) = 0.0065 HXR</li>
+        </ul>
+        <h4>Final Claim</h4>
+        <p>Upon completing the full 1000-day stake, the final claim rewards are calculated with a 10x bonus:</p>
+        <ul>
+            <li><strong>Calculation:</strong> (1000 days × 0.00001 HXR/day) × 10 = 0.1 HXR</li>
+            <li><strong>Final Reward After Adjustment:</strong> 0.1 HXR - 0.005 HXR (previously claimed and returned) = 0.095 HXR</li>
+        </ul>
+    </div>
     <h2>Stake Data and Utility Functions</h2>
     <p>
         The HexRewards contract provides several utility functions to retrieve stake-related data:
