@@ -318,7 +318,7 @@ async function displayStakeList(stakeList) {
       const tierStakesCount = await contract.methods.tierStakesCount(tierIndex).call();
       let registerButtonDisplayed = false;
 
-      if (!isStakeRegistered && stake.stakeId > await contract.methods.STAKEID_PROTECTION().call() && tierStakesCount < 100) {
+      if (!isStakeRegistered && stake.stakeId > await contract.methods.STAKEID_PROTECTION().call() && tierStakesCount < 369) {
         const registerButton = document.createElement('button');
         registerButton.textContent = 'Register';
         registerButton.addEventListener('click', async () => {
