@@ -2,6 +2,7 @@ const contractAddress = '0xcfcb89f00576a775d9f81961a37ba7dcf12c7d9b'; // Replace
 const MAX_STAKES_PER_TIER = 369;
 
 let web3, contract, accounts, abi;
+let claimedReward, earlyReward, finishedReward;
 
 async function loadABI() {
     try {
@@ -186,7 +187,7 @@ async function queryStake() {
     const stake = stakeList[stakeIndex];
     const consumedDays = await contract.methods.calculateConsumedDays(stake.lockedDay, stake.stakedDays).call();
 
-    let claimedReward, earlyReward, finishedReward;
+    
     try {
       claimedReward = await contract.methods.getClaimedReward(accounts[0], stakeIndex).call();
       earlyReward = await contract.methods.calculateReward(consumedDays, stake.stakedDays, stake.unlockedDay).call();
