@@ -215,11 +215,77 @@ async function queryStake() {
     `;
 
     document.getElementById('stakeInfo').innerHTML = stakeInfo;
+    
+      // Display the "Check Buttons" button
+      const checkButtonsButton = `<button id="checkButtonsButton">Check Buttons</button>`;
+      document.getElementById('stakeButtons').innerHTML = checkButtonsButton;
+    
+      // Add click event listener to the "Check Buttons" button
+      document.getElementById('checkButtonsButton').addEventListener('click', async () => {
+        await displayButtons(stake, stakeIndex);
+
   } catch (error) {
     console.error('Error retrieving stake:', error);
     alert('Failed to retrieve stake. Please check the console for more information.');
   }
 }
+
+
+async function displayButtons(stake, stakeIndex) {
+  let buttonsHTML = '';
+
+  // Register button logic
+  const isStakeRegistered = await contract.methods.isStakeRegistered(stake.stakeId).call();
+  const tierIndex = await contract.methods.determineTier(stake.stakedHearts).call();
+  const tierStakesCount = await contract.methods.tierStakesCount(tierIndex).call();
+
+  if (!isStakeRegistered && stake.stakeId > await contract.methods.STAKEID_PROTECTION().call() && tierStakesCount < 100) {
+    buttonsHTML += `<button id="registerButton">Register</button>`;
+  }
+
+  // Claim button logic
+  const claimedReward = await contract.methods.getClaimedReward(accounts[0], stakeIndex).call();
+  if (claimedReward.toString() === '0') {
+    buttonsHTML += `<button id="claimButton">Claim</button>`;
+  }
+
+  // Return button logic
+  if (claimedReward.toString() !== '0') {
+    buttonsHTML += `<button id="returnButton">Return + (30% burn fee)</button>`;
+  }
+
+  document.getElementById('stakeButtons').innerHTML = buttonsHTML;
+
+  // Add click event listeners to the buttons
+  const registerButton = document.getElementById('registerButton');
+  if (registerButton) {
+    registerButton.addEventListener('click', async () => {
+      await contract.methods.claimStake(stakeIndex).send({ from: accounts[0] });
+      await queryStake();
+      await displayRemainingSeats();
+    });
+  }
+
+  const claimButton = document.getElementById('claimButton');
+  if (claimButton) {
+    claimButton.addEventListener('click', async () => {
+      await claimReward(stakeIndex);
+      await queryStake();
+    });
+  }
+
+  const returnButton = document.getElementById('returnButton');
+  if (returnButton) {
+    returnButton.addEventListener('click', async () => {
+      const claimedRewardNumber = Number(claimedReward.toString());
+      const returnAmount = claimedRewardNumber * 1.3;
+      await returnReward(stakeIndex, returnAmount);
+      await queryStake();
+    });
+  }
+}
+
+
 async function queryStake2() {
   const stakeIndexInput = document.getElementById('stakeIndexInput');
   const stakeIndex = parseInt(stakeIndexInput.value);
