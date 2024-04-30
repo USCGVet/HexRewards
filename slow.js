@@ -223,7 +223,7 @@ async function queryStake() {
       // Add click event listener to the "Check Buttons" button
       document.getElementById('checkButtonsButton').addEventListener('click', async () => {
         await displayButtons(stake, stakeIndex);
-
+      });
   } catch (error) {
     console.error('Error retrieving stake:', error);
     alert('Failed to retrieve stake. Please check the console for more information.');
