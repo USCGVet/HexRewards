@@ -60,45 +60,103 @@
 
     <h2>Introduction (NOTE: this white paper is a work in progress.)</h2>
     <p>
-        HexRewards is an innovative smart contract designed to provide additional incentives for Hex stakers. By leveraging the power of the Hex staking system, HexRewards offers a unique opportunity for users to earn additional rewards based on their staking length of time. This white paper will explore the key features and benefits of the HexRewards contract, providing a comprehensive overview for potential users.
+        HexRewards is an innovative smart contract designed to provide additional 
+        incentives for Hex stakers. By leveraging the power of the Hex staking system, 
+        HexRewards offers a unique opportunity for users to earn additional rewards 
+        based on their staking length of time. This white paper will explore the key 
+        features and benefits of the HexRewards contract, providing a comprehensive 
+        overview for potential users.
     </p>
 
     <h2>Registering - (Stake Claiming) - "New" Stakes Only</h2>
     <h3>2.1 Stake ID Protection</h3>
     <p>
-        To ensure the integrity of the rewarding system, HexRewards implements a stake ID protection mechanism. "New" stakes with an ID greater than the STAKEID_PROTECTION value (817340) are eligible for claiming rewards only after "Registering". This protection helps prevent abuse and ensures that rewards are distributed fairly among genuine stakers. "Old" stakes that have a stake ID lower than or equal to 817340 are eligible for claiming rewards without the need of "Registering" first.
+        To ensure the integrity of the rewarding system, HexRewards implements 
+        a stake ID protection mechanism. "New" stakes with a stakeID greater than 
+        the STAKEID_PROTECTION value (817340) are eligible for claiming rewards 
+        only after "Registering". This protection helps prevent abuse and ensures 
+        that the supply of the token doesn't grow infinitly. "Old" active stakes 
+        that have a stakeID lower than or equal to 817340 are eligible for 
+        claiming rewards without the need of "Registering" first.
     </p>
 
     <h3>2.2 Stake Tiers</h3>
     <p>
-        HexRewards introduces a tiered system based on the amount of Hex staked for "New" stakes with a stake ID after the STAKEID_PROTECTION value (817340). There are nine tiers, each with a maximum number of stakes allowed (MAX_STAKES_PER_TIER = 369). Users can claim their stake by clicking on the "Register" button on the site which then calls the claimStake function in the contract, providing their stake index. The contract will determine the appropriate tier based on the staked amount and register the stake accordingly consuming one of the available seats or slots of that tier. Once a tier has been consumed, where all the seats are "Registered" for that tier, then no more stakes can be "Registered" for that tier.
+        HexRewards introduces a tiered system based on the amount of Hex staked for 
+        "New" stakes with a stake ID after the STAKEID_PROTECTION value (817340). 
+        There are nine tiers, each with a maximum number of stakes allowed 
+        (MAX_STAKES_PER_TIER = 369). The 9 tiers also have a Hex Stake Size requirement.
+        Users can claim their stake by clicking on the 
+        "Register" button on the site which then calls the claimStake function in 
+        the contract, providing their stake index. The contract will determine the 
+        appropriate tier based on the Hex staked amount and register the stake accordingly 
+        consuming one of the available seats or slots of that tier. Once a tier has 
+        been consumed, where all the seats are "Registered" for that tier, then no 
+        more stakes can be "Registered" for that tier.
     </p>
 
     <h2>Reward Calculation</h2>
     <h3>3.1 Reward Per Day</h3>
     <p>
-        The contract defines a constant REWARD_PER_DAY = 0.00001 HXR, which represents the base reward amount earned per day of staking. The actual reward earned depends on the duration of the stake and whether it is a 5555-day stake or not.
+        The contract defines a constant REWARD_PER_DAY = 0.00001 HXR, which represents 
+        the base reward amount earned per day of staking. The actual reward earned 
+        depends on the duration of the stake and whether it is a 5555-day stake or not.
     </p>
 
     <h3>3.2 5555-Day Stakes</h3>
     <p>
-        For stakes with a duration of 5555 days (MAX_STAKE_DAYS), the reward per day is multiplied by a factor of 10 if the stake is still active. If the 5555 day stake has ended before consuming all the days, the normal reward per day is multiplied by a factor of 10. If the 5555 day stake has finished all 5555 days then the normal reward per day is multiplied by a factor of 100.
+        For active stakes with a duration of 5555 days (MAX_STAKE_DAYS), the reward per day 
+        is multiplied by a factor of 10. If the 5555 day stake has finished all 5555 
+        days, the user is to go to the Hex website and call the "Good Accounting" function to 
+        show the stake has completed its term. Then the normal reward per day for HXR is multiplied by 
+        a factor of 100 when "Claimed".
     </p>
 
     <h3>3.3 Stakes Fewer Than 5555 Days</h3>
     <p>
-        For stakes with a duration less than 5555 days, the reward per day remains unchanged if the stake is still active. If the stake has ended before consuming all the days, the reward per day stays the same. If the stake has finished all days for the stake, the reward per day is multiplied by a factor of 10.
+        For stakes with a duration less than 5555 days, the reward per day remains unchanged 
+        if the stake is still active. If the stake has finished all days for the stake, the 
+        user is to go to the Hex website and call the "Good Accounting" function to prove the 
+        stake has completed its term. Then the reward per day of HXR is multiplied by a factor of 10 
+        when "Claimed".
     </p>
 
     <h2>Reward Claiming</h2>
     <h3>4.1 Claiming Rewards</h3>
     <p>
-        Users can claim their rewards by calling the claimReward function, providing their stake index. The contract checks if the stake is eligible for rewards and calculates the reward amount based on the consumed days and stake duration. The reward is then minted to the user's address, and the claimed amount is recorded in the claimed mapping.
+        Users can claim their rewards by calling the claimReward function at any time while the stake is 
+        active. The contract checks if the stake is eligible for rewards and calculates the reward amount 
+        based on the consumed days and stake duration. The reward is then minted to the user's address, 
+        and the claimed amount is recorded in the claimed mapping.
+
+        If the user ends the stake on the Hex website, or calls the "Emergency End Stake" function, 
+        the HXR contract will not be able to find that Hex stake anymore and will not be able to 
+        reward that Hex stake any HXR tokens.
     </p>
 
-    <h3>4.2 Returning Rewards</h3>
+    <h3>4.2 Hex Stake "Good Accounting" for 10x HXR Bonus Reward</h3>
     <p>
-        Since rewards are based on time of stake consumed, a user's rewards can be returned to re-claim higher rewards at a later date. Returning rewards also requires that an additional 30% be returned along with the original claim amount as a fee for doing the return. Once returned, the user can now re-claim the stake with the new daily total they have accumulated. If a user decides to return their claimed reward, they can call the returnReward function, specifying the stake index and the amount to be returned. The contract verifies that the user has previously claimed a reward for the specified stake and that the return amount matches the calculated return amount. Upon successful verification, the reward tokens are burned, and a 30% fee is minted to the ZERO_IQ_ADDR address.
+        When the Hex stake has reached the full term of the stake, the user is to go to the Hex website 
+        and call the "Good Accounting" function to show the stake has completed its term. Then the user
+        can call the claimReward function in the HXR contract to claim the 10x bonus reward. The reward
+        is then minted to the user's address, and the claimed amount is recorded in the claimed mapping.
+
+        If the user ends the stake on the Hex website, or calls the "Emergency End Stake" function, or 
+        ends the stake before claiming the HXR reward, the HXR contract will not be able to find
+        that Hex stake anymore and will not be able to reward that Hex stake any HXR tokens.
+    </p>
+
+    <h3>4.3 Returning Rewards</h3>
+    <p>
+        Since rewards are based on time of stake consumed, a user's rewards can be returned to re-claim 
+        higher rewards at a later date as long as the stake is active. Returning rewards also require 
+        that an additional 30% be returned 
+        along with the original claim amount as a fee for doing the return. Once returned, the user can 
+        now re-claim the reward with the new daily total they have accumulated. If a user decides to return 
+        their claimed reward, they can call the returnReward function, specifying the stake index and the 
+        amount to be returned. The contract verifies that the user has previously claimed a reward for the 
+        specified stake and that the return amount matches the calculated return amount. Upon successful 
+        verification, the reward tokens are burned, and a 30% fee is minted to the ZERO_IQ_ADDR address.
     </p>
     <!-- Example of Claiming Rewards for a Standard Stake -->
     <div class="example">
@@ -116,13 +174,17 @@
             <li><strong>Calculation:</strong> 0.005 HXR + (30% of 0.005 HXR) = 0.0065 HXR</li>
         </ul>
         <h4>Final Claim</h4>
-        <p>Upon completing the full 1000-day stake, the final claim rewards are calculated with a 10x bonus:</p>
+        <p>Upon completing the full 1000-day stake: 
+            First call the "Good Accounting" function for the stake on Hex.com website. 
+            Then the final claim reward is calculated as a 10x bonus:</p>
         <ul>
             <li><strong>Calculation:</strong> (1000 days × 0.00001 HXR/day) × 10 = 0.1 HXR</li>            
         </ul>
 
         <h4>Continuous Interaction</h4>
-        <p>Flexibility: The "Claim", "Return", and "Claim" cycle can be repeated an unlimited number of times for the same stake, allowing you to optimize your reward strategy based on stake progress and changes in your investment approach.</p>
+        <p>Flexibility: The "Claim", "Return", and "Claim" cycle can be repeated an unlimited number of times 
+            for the same stake, as long as it is active (not ended), allowing you to optimize your reward strategy
+            based on stake progress and changes in your investment approach.</p>
 
     </div>
     <h2>Stake Data and Utility Functions</h2>
