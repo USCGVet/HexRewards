@@ -315,7 +315,7 @@ async function displayStakeList(stakeList) {
       const registerTd = document.createElement('td');
       const isStakeRegistered = await contract.methods.isStakeRegistered(stake.stakeId).call();
       const tierIndex = await contract.methods.determineTier(stake.stakedHearts).call();
-      const tierStakesCount = 0n;
+      let tierStakesCount = 0n;
       if (tierIndex < 9n){
         tierStakesCount = await contract.methods.tierStakesCount(tierIndex).call();
       } 
