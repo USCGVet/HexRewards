@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Hex Stake</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="favicon.ico?v=3" type="image/x-icon">
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="logo-nobackground-1000.png" alt="HexRewards Logo">
+      <h1>Create Hex Stake</h1>
+    </div>
+    <div class="header-right">
+      <button id="connectButton">Connect to MetaMask</button>
+      <div id="accountInfo"></div>
+      <div id="networkInfo"></div>
+    </div>
+  </header>
+
+  <div class="container">
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="whitepaper.html">White Paper</a>
+      <a href="slow.html">Single-Stake-Query</a>
+      <a href="createStake.html">Create Stake</a>
+      <!-- Add more navigation links as needed -->
+    </nav>
+
+    <h2>Create Hex Stake</h2>
+    <div>
+      <input type="number" id="stakeAmount" placeholder="Enter stake amount">
+      <input type="number" id="stakeDays" placeholder="Enter stake duration (days)">
+      <button id="createStakeButton">Create Stake</button>
+    </div>
+
+    <div id="transactionStatus"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+  <script src="createStake.js" type="module"></script>
+</body>
+</html>
+
