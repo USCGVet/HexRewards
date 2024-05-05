@@ -2,7 +2,7 @@
 // Terminal CD frontend
 // Terminal http-server
 
-const contractAddress = '0xcfcb89f00576a775d9f81961a37ba7dcf12c7d9b'; // Replace with your contract address
+const contractAddress = '0xCfCb89f00576A775d9f81961A37ba7DCf12C7d9B'; // Replace with your contract address  DEV Address:0x8Aed6FE10dF3d6d981B101496C9c7245AE65cAEc  // Real HexRewards:0xCfCb89f00576A775d9f81961A37ba7DCf12C7d9B
 const MAX_STAKES_PER_TIER = 369;
 
 let web3, contract, accounts, abi;
@@ -315,10 +315,13 @@ async function displayStakeList(stakeList) {
       const registerTd = document.createElement('td');
       const isStakeRegistered = await contract.methods.isStakeRegistered(stake.stakeId).call();
       const tierIndex = await contract.methods.determineTier(stake.stakedHearts).call();
-      const tierStakesCount = await contract.methods.tierStakesCount(tierIndex).call();
+      const tierStakesCount = 0n;
+      if (tierIndex < 9n){
+        tierStakesCount = await contract.methods.tierStakesCount(tierIndex).call();
+      } 
       let registerButtonDisplayed = false;
 
-      if (!isStakeRegistered && stake.stakeId > await contract.methods.STAKEID_PROTECTION().call() && tierStakesCount < 369) {
+      if (!isStakeRegistered && stake.stakeId > await contract.methods.STAKEID_PROTECTION().call() && tierStakesCount < 369 && tierIndex < 9n) {
         const registerButton = document.createElement('button');
         registerButton.textContent = 'Register';
         registerButton.addEventListener('click', async () => {
@@ -333,7 +336,7 @@ async function displayStakeList(stakeList) {
 
       // Claim button logic
       const claimTd = document.createElement('td');
-      if (!registerButtonDisplayed && claimedReward.toString() === '0') {
+      if (!registerButtonDisplayed && claimedReward.toString() === '0' && ( ( stake.stakeId >= 817340 && tierIndex < 9n ) || ( stake.stakeId < 817340 ) )) {
         const claimButton = document.createElement('button');
         claimButton.textContent = 'Claim';
         claimButton.addEventListener('click', async () => {
@@ -421,8 +424,41 @@ async function addTokenToMetaMask() {
     }
   }  
 
+
+async function addHexTokenToMetaMask() {
+  try {
+    const tokenAddress = '0x2b591e99afE9f32eAA6214f7B7629768c40Eeb39';
+    const tokenSymbol = 'HEX';
+    const tokenDecimals = 8;
+    const tokenImage = './HEXagon.png';
+
+    const wasAdded = await ethereum.request({
+      method: 'wallet_watchAsset',
+      params: {
+        type: 'ERC20',
+        options: {
+          address: tokenAddress,
+          symbol: tokenSymbol,
+          decimals: tokenDecimals,
+          image: tokenImage,
+        },
+      },
+    });
+
+    if (wasAdded) {
+      console.log('Token added to MetaMask');
+    } else {
+      console.log('Token not added to MetaMask');
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}  
+
+
 document.getElementById('connectButton').addEventListener('click', connectToMetaMask);
 document.getElementById('addTokenButton').addEventListener('click', addTokenToMetaMask);
+document.getElementById('addHexTokenButton').addEventListener('click', addHexTokenToMetaMask);
 
 // Call the checkAndConnectToMetaMask function when the page loads
 window.addEventListener('load', checkAndConnectToMetaMask);
