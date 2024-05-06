@@ -265,7 +265,7 @@ async function displayStakeList(stakeList) {
 
     const table = document.createElement('table');
     const headerRow = document.createElement('tr');
-    const headers = ['Stake ID', 'Staked Hearts', 'Stake Shares', 'Locked Day', 'Staked Days', 'Unlocked Day', 'Auto Stake', 'Consumed Days', 'Early Reward', 'Finished Reward', 'Claimed Reward', 'Register', 'Claim Reward', 'Return Reward'];
+    const headers = ['Stake ID', 'Staked Hearts', 'Stake Shares', 'Locked Day', 'Staked Days', 'Unlocked Day', 'Auto Stake', 'Consumed Days', 'Early Reward', 'Finished Reward', 'Claimed Reward', 'Register', 'Claim Reward', 'Good Accounting (for 10x Bonus)', 'Return Reward'];
 
     headers.forEach(header => {
       const th = document.createElement('th');
@@ -346,6 +346,18 @@ async function displayStakeList(stakeList) {
       }
       row.appendChild(claimTd);
 
+      // Good Accounting button logic
+      const goodAccountingTd = document.createElement('td');
+      if (!registerButtonDisplayed && BigInt(claimedReward) == 0n && stake.unlockedDay == 0n && consumedDays >= stake.stakedDays) {
+        const goodAccountingButton = document.createElement('button');
+        goodAccountingButton.textContent = 'Good Accounting';
+        goodAccountingButton.addEventListener('click', async () => {
+          await callGoodAccounting(stake.stakeId, startIndex + index);
+        });
+        goodAccountingTd.appendChild(goodAccountingButton);
+      }
+      row.appendChild(goodAccountingTd);
+
       // Return button logic
       const returnTd = document.createElement('td');
       if (!registerButtonDisplayed && claimedReward.toString() !== '0') {
@@ -392,7 +404,35 @@ async function displayStakeList(stakeList) {
   showPage(currentPage);
 }
  
-  
+
+async function loadHexABI() {
+  try {
+    const response = await fetch('./HexABI.json');
+    const hexAbi = await response.json();
+    return hexAbi;
+  } catch (error) {
+    console.error('Error loading Hex ABI:', error);
+    return null;
+  }
+}
+
+async function callGoodAccounting(stakeId, stakeIndex) {
+  try {
+    const hexContractAddress = '0x2b591e99afe9f32eaa6214f7b7629768c40eeb39';
+    const hexAbi = await loadHexABI();
+    if (!hexAbi) {
+      throw new Error('Failed to load Hex ABI.');
+    }
+    const hexContract = new web3.eth.Contract(hexAbi, hexContractAddress);
+
+    await hexContract.methods.stakeGoodAccounting(accounts[0], stakeIndex, stakeId).send({ from: accounts[0] });
+    alert('Good Accounting called successfully!');
+    await getStakeList();
+  } catch (error) {
+    console.error(error);
+    alert('Failed to call Good Accounting. Please check the console for more information.');
+  }
+}
   
 async function addTokenToMetaMask() {
     try {
