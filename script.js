@@ -360,17 +360,16 @@ async function displayStakeList(stakeList) {
 
       // Return button logic
       const returnTd = document.createElement('td');
-      if (!registerButtonDisplayed && claimedReward.toString() !== '0') {
-        const returnButton = document.createElement('button');
-        returnButton.textContent = 'Return + (30% burn fee)';
-        returnButton.addEventListener('click', async () => {
-          const claimedRewardNumber = Number(claimedReward.toString());
-          const returnAmount = claimedRewardNumber * 1.3;
-          await returnReward(startIndex + index, returnAmount);
-        });
-        returnTd.appendChild(returnButton);
-      }
-      row.appendChild(returnTd);
+        if (!registerButtonDisplayed && claimedReward.toString() !== '0') {
+          const returnButton = document.createElement('button');
+          returnButton.textContent = 'Return + (30% burn fee)';
+          returnButton.addEventListener('click', async () => {
+            const returnAmount = await contract.methods.calculateReturnAmount(startIndex + index).call();
+            await returnReward(startIndex + index, returnAmount);
+          });
+          returnTd.appendChild(returnButton);
+        }
+        row.appendChild(returnTd);
 
       return row;
     });
