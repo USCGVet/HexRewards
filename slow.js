@@ -281,8 +281,7 @@ async function displayButtons(stake, stakeIndex) {
   if (returnButton) {
     returnButton.textContent = 'Return + (30% burn fee)';
     returnButton.addEventListener('click', async () => {
-      const claimedRewardNumber = Number(claimedReward.toString());
-      const returnAmount = claimedRewardNumber * 1.3;
+      const returnAmount = await contract.methods.calculateReturnAmount(stakeIndex).call();
       await returnReward(stakeIndex, returnAmount);
       await queryStake();
     });
