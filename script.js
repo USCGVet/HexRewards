@@ -360,16 +360,24 @@ async function displayStakeList(stakeList) {
 
       // Return button logic
       const returnTd = document.createElement('td');
-        if (!registerButtonDisplayed && claimedReward.toString() !== '0') {
-          const returnButton = document.createElement('button');
-          returnButton.textContent = 'Return + (30% burn fee)';
-          returnButton.addEventListener('click', async () => {
-            const returnAmount = await contract.methods.calculateReturnAmount(startIndex + index).call();
-            await returnReward(startIndex + index, returnAmount);
-          });
-          returnTd.appendChild(returnButton);
-        }
-        row.appendChild(returnTd);
+      if (!registerButtonDisplayed && claimedReward.toString() !== '0') {
+        const returnButton = document.createElement('button');
+
+        // Calculate the return amount based on stake days consumed and stake length
+        const stakeLength = Number(stake.stakedDays);
+        const returnRate = stakeLength === 5555 ? 0.0001 : 0.00001;
+        const returnAmount = (Number(consumedDays) * returnRate * 1.3).toFixed(8);
+
+        returnButton.textContent = `Return HXR fee: ${returnAmount}`;
+
+        returnButton.addEventListener('click', async () => {
+          const contractReturnAmount = await contract.methods.calculateReturnAmount(startIndex + index).call();
+          await returnReward(startIndex + index, contractReturnAmount);
+        });
+
+        returnTd.appendChild(returnButton);
+      }
+      row.appendChild(returnTd);
 
       return row;
     });
