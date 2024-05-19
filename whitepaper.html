@@ -148,61 +148,60 @@
 
     <h3>4.3 Returning Rewards</h3>
     <p>
-        Since rewards are based on time of stake consumed, a user's rewards can be returned to re-claim 
-        higher rewards at a later date as long as the stake is active. Returning rewards also require 
-        that an additional 30% be returned 
-        along with the original claim amount as a fee for doing the return. Once returned, the user can 
-        now re-claim the reward with the new daily total they have accumulated. If a user decides to return 
-        their claimed reward, they can call the returnReward function, specifying the stake index and the 
-        amount to be returned. The contract verifies that the user has previously claimed a reward for the 
-        specified stake and that the return amount matches the calculated return amount. Upon successful 
-        verification, the reward tokens are burned, and a 30% fee is minted to the ZERO_IQ_ADDR address.
+        The Return function in the HexRewards contract allows users to return their previously claimed rewards in exchange for  
+        higher rewards at a later date. By returning the claimed rewards along with an additional fee, users can re-activate their stake 
+        and accumulate more HXR tokens based on the extended time their stake has been active. This feature provides flexibility, enabling users 
+        to optimize their reward strategy based on their stake progress and investment goals.  Be mindful of the agressiveness of the fee.
+        The fee is calculated by looking at the current number of days you've already consumed, then it multiplies that number of days times
+        the daily HXR reward amount and adds an additional 30% on top.  So when you claim, as each day passes, the return fee increases such that by 170 days after
+        you've claimed, the return amount would equate to the entire 10x bonus you would have received had you waited to claim instead.  There would be no point 
+        returning your claim after 170 days.   
     </p>
-    <!-- Example of Claiming Rewards for a Standard Stake -->
+    <!-- Example of Returning Rewards for a Standard Stake -->
     <div class="example">
         <h2>Example:</h2>
-        <h3>Claiming Rewards for a Standard Non-5555 Day Stake</h3>
+        <h3>Returning Rewards for a Standard Non-5555 Day Stake</h3>
         <p><strong>Stake Duration:</strong> 1000 days</p>
         <h4>Initial Claim</h4>
-        <p>You claim rewards at day 500 of your 1000-day stake, receiving 0.005 HXR calculated as follows:</p>
+        <p>You claim rewards at day 100 of your 1000-day stake, receiving 0.001 HXR calculated as follows:</p>
         <ul>
-            <li><strong>Calculation:</strong> 500 days × 0.00001 HXR/day = 0.005 HXR</li>
+            <li><strong>Calculation:</strong> 100 days consumed of stake × 0.00001 HXR/day = 0.001 HXR</li>
         </ul>
-        <h4>Return Process</h4>
-        <p>To reactivate the claim option, you return 0.0065 HXR (including a 30% fee on the initially claimed rewards):</p>
+        <h4>Return the same day that you claimed:</h4>
+        <p>You decide to return the claim on the same day you claimed, you return 0.0013 HXR:</p>
         <ul>
-            <li><strong>Calculation:</strong> 0.005 HXR + (30% of 0.005 HXR) = 0.0065 HXR</li>
+            <li><strong>Calculation:</strong> (100 days consumed of stake) × 0.00001 HXR/day = 0.001 HXR + (30% of 0.001 HXR) = 0.0013 HXR</li>
+            <li><strong>Return Amount:</strong> 0.001 HXR + (30% of 0.001 HXR) = 0.0013 HXR</li>
         </ul>
-        <h4>Final Claim</h4>
+        <h4>Return 100 days after claiming:</h4>
+        <p>You decide to return the rewards 100 days after you claimed (200 days consumed of your Hex stake). 
+            The return amount is HXR calculated as follows:</p>
+        <ul>
+            <li><strong>Calculation:</strong> (200 days consumed of stake) × 0.00001 HXR/day = 0.002 HXR</li>
+            <li><strong>Return Amount:</strong> 0.002 HXR + (30% of 0.002 HXR) = 0.0026 HXR</li>
+        </ul>
+    </div>
+    
+    <h2>Final Claim</h2>
+    <h3>5.1 Final Claim - "Good Accounting"</h3>
         <p>Upon completing the full 1000-day stake: 
             First call the "Good Accounting" function for the stake on Hex.com website. 
             Then the final claim reward is calculated as a 10x bonus:</p>
         <ul>
-            <li><strong>Calculation:</strong> (1000 days × 0.00001 HXR/day) × 10 = 0.1 HXR</li>            
+            <li><strong>Calculation:</strong> (1000 days consumed × 0.00001 HXR/day) × 10 = 0.1 HXR</li>            
         </ul>
 
-        <h4>Continuous Interaction</h4>
+    <h2>Continuous Interaction</h2>
+    <h3>6.1 Continuous Interaction</h3>
         <p>Flexibility: The "Claim", "Return", and "Claim" cycle can be repeated an unlimited number of times 
             for the same stake, as long as it is active (not ended), allowing you to optimize your reward strategy
             based on stake progress and changes in your investment approach.</p>
-
-    </div>
-    <h2>Stake Data and Utility Functions</h2>
-    <p>
-        The HexRewards contract provides several utility functions to retrieve stake-related data:
-    </p>
-    <ul>
-        <li>stakeDataFetch: Returns the stake data for the contract itself.</li>
-        <li>getClaimedReward: Retrieves the claimed reward amount for a specific user and stake index.</li>
-        <li>getStakeList: Returns an array of HEXStake structs representing the stakes of a given account.</li>
-        <li>getCurrentDay: Retrieves the current day from the Hex contract.</li>
-        <li>calculateConsumedDays: Calculates the number of consumed days based on the locked day and stake duration.</li>
-    </ul>
-
+   
     <h2>Conclusion</h2>
     <p>
         HexRewards offers an exciting opportunity for Hex stakers to earn additional rewards based on their staking activity. With its tiered system, stake protection, and flexible reward calculation, HexRewards aims to incentivize long-term staking and provide a rewarding experience for users. By leveraging the power of smart contracts and the Hex staking system, HexRewards seeks to enhance the value proposition for Hex stakers and contribute to the growth and adoption of the Hex ecosystem.
     </p>
+
 </div>
             <!-- Add more sections and content as needed -->
 
