@@ -153,9 +153,8 @@
         and accumulate more HXR tokens based on the extended time their stake has been active. This feature provides flexibility, enabling users 
         to optimize their reward strategy based on their stake progress and investment goals.  Be mindful of the agressiveness of the fee.
         The fee is calculated by looking at the current number of days you've already consumed, then it multiplies that number of days times
-        the daily HXR reward amount and adds an additional 30% on top.  So when you claim, as each day passes, the return fee increases such that by 170 days after
-        you've claimed, the return amount would equate to the entire 10x bonus you would have received had you waited to claim instead.  There would be no point 
-        returning your claim after 170 days.   
+        the daily HXR reward amount and adds an additional 30% on top. As long as you call the return function within the timeframe of your Hex stake, 
+        the total return amount should always be less than 1/10th the Good Accounting Reward 10x bonus.
     </p>
     <!-- Example of Returning Rewards for a Standard Stake -->
     <div class="example">
