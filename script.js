@@ -280,8 +280,10 @@ async function displayStakeList(stakeList) {
 
     let claimedReward, earlyReward, finishedReward, returnAmt;
 
+    const globalIndex = parseInt(startIndex + index); // Pre-calculate the index
+    
     try {
-      claimedReward = await contract.methods.getClaimedReward(accounts[0], parseInt(startIndex + index)).call();
+      claimedReward = await contract.methods.getClaimedReward(accounts[0], globalIndex).call();
     } catch (error) {
       console.error('Error retrieving claimed reward:', error);
       claimedReward = '0';
@@ -302,11 +304,14 @@ async function displayStakeList(stakeList) {
     }
     
     try {
-      returnAmt = await contract.methods.calculateReturnAmount(parseInt(startIndex + index)).call();
+      console.log(`Calculating return amount for stake index: ${globalIndex}`);
+      returnAmt = await contract.methods.calculateReturnAmount(globalIndex).call();
+      console.log(`Return amount: ${returnAmt}`);
     } catch (error) {
       console.error('Error retrieving return amount:', error);
       returnAmt = '0';
     }
+
 
 
       const row = document.createElement('tr');
