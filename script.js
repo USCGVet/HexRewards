@@ -303,6 +303,7 @@ async function displayStakeList(stakeList) {
       finishedReward = '0';
     }
     
+    /*
     try {
       console.log(`Calculating return amount for stake index: ${globalIndex}`);
       returnAmt = await contract.methods.calculateReturnAmount(globalIndex).call();
@@ -311,6 +312,18 @@ async function displayStakeList(stakeList) {
       console.error('Error retrieving return amount:', error);
       returnAmt = '0';
     }
+    */
+    // Convert earlyReward to Wei
+    const earlyRewardWei = web3.utils.toWei(earlyReward, 'ether');
+
+    // Convert earlyRewardWei to a BigInt
+    const earlyRewardBigInt = BigInt(earlyRewardWei);
+
+    // Multiply earlyReward by 1.30 and convert it to a BigInt
+    const returnAmountWei = (earlyRewardBigInt * BigInt(130)) / BigInt(100);
+
+    // Convert returnAmountWei to Ether
+    returnAmt = web3.utils.fromWei(returnAmountWei.toString(), 'ether');
 
 
 
@@ -396,7 +409,7 @@ async function displayStakeList(stakeList) {
 
         returnButton.addEventListener('click', async () => {
           const contractReturnAmount = returnAmt; // await contract.methods.calculateReturnAmount(startIndex + index).call();
-          await returnReward(parseInt(startIndex + index), contractReturnAmount);
+          await returnReward(globalIndex, contractReturnAmount);
         });
 
         returnTd.appendChild(returnButton);
