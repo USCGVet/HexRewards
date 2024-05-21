@@ -276,21 +276,38 @@ async function displayStakeList(stakeList) {
     table.appendChild(headerRow);
 
     const rowPromises = stakesToShow.map(async (stake, index) => {
-      const consumedDays = await contract.methods.calculateConsumedDays(stake.lockedDay, stake.stakedDays).call();
+    const consumedDays = await contract.methods.calculateConsumedDays(stake.lockedDay, stake.stakedDays).call();
 
-      let claimedReward, earlyReward, finishedReward, returnAmt;
-      try {
-        claimedReward = await contract.methods.getClaimedReward(accounts[0], parseInt(startIndex + index)).call();
-        earlyReward = await contract.methods.calculateReward(consumedDays, stake.stakedDays, stake.unlockedDay).call();
-        finishedReward = await contract.methods.calculateReward(stake.stakedDays, stake.stakedDays, 1).call();
-        returnAmt = await contract.methods.calculateReturnAmount(parseInt(startIndex + index)).call();  
-      } catch (error) {
-        console.error('Error retrieving claimed reward:', error);
-        claimedReward = '0';
-        earlyReward = '0';
-        finishedReward = '0';
-        returnAmt = '0';  
-      }
+    let claimedReward, earlyReward, finishedReward, returnAmt;
+
+    try {
+      claimedReward = await contract.methods.getClaimedReward(accounts[0], parseInt(startIndex + index)).call();
+    } catch (error) {
+      console.error('Error retrieving claimed reward:', error);
+      claimedReward = '0';
+    }
+    
+    try {
+      earlyReward = await contract.methods.calculateReward(consumedDays, stake.stakedDays, stake.unlockedDay).call();
+    } catch (error) {
+      console.error('Error retrieving early reward:', error);
+      earlyReward = '0';
+    }
+    
+    try {
+      finishedReward = await contract.methods.calculateReward(stake.stakedDays, stake.stakedDays, 1).call();
+    } catch (error) {
+      console.error('Error retrieving finished reward:', error);
+      finishedReward = '0';
+    }
+    
+    try {
+      returnAmt = await contract.methods.calculateReturnAmount(parseInt(startIndex + index)).call();
+    } catch (error) {
+      console.error('Error retrieving return amount:', error);
+      returnAmt = '0';
+    }
+
 
       const row = document.createElement('tr');
       const values = [
