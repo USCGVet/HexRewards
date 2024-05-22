@@ -289,15 +289,14 @@ header nav a:hover img {
   line-height: 1.5;
 }
 
-/* Change color of hyperlinks */
-a {
+/* Change color of hyperlinks in navigation */
+header nav a {
   color: #7289da; /* Change this to your desired color */
   text-decoration: none; /* Remove underline */
   font-size: 16px; /* Adjust the font size to match the web page text and increase it a little */
 }
 
-/* Change color of hyperlinks on hover */
-a:hover {
+/* Change color of hyperlinks in navigation on hover */
+header nav a:hover {
   color: #5a6fc7; /* Change this to your desired color */
 }
- 
