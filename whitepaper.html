@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HexRewards - White Paper</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=1.0.1">
     <link rel="icon" href="favicon.ico?v=3" type="image/x-icon">
     <style>
         .whitepaper {
@@ -15,23 +15,50 @@
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        
+
         .whitepaper h1 {
             font-size: 36px;
             margin-bottom: 20px;
             text-align: center;
         }
-        
+
         .whitepaper h2 {
             font-size: 24px;
             margin-top: 40px;
             margin-bottom: 20px;
         }
-        
+
         .whitepaper p {
             font-size: 18px;
             line-height: 1.6;
             margin-bottom: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #1e2233;
+            padding: 20px;
+        }
+
+        nav {
+            width: 100%;
+            text-align: left;
+            background-color: #0c1226;
+            padding: 10px 20px;
+            margin-bottom: 20px;
+        }
+
+        nav a {
+            color: #7289da;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 16px;
+        }
+
+        nav a:hover {
+            color: #5a6fc7;
         }
     </style>
 </head>
@@ -41,28 +68,23 @@
             <img src="logo-nobackground-1000.png" alt="HexRewards Logo">
             <h1>HexRewards</h1>
         </div>
-        
     </header>
 
-    <div class="container">
-        <nav>
-            <a href="index.html">| Home </a>
-            <a href="whitepaper.html">| White Paper</a>
-            <a href="slow.html">| Single-Stake-Query |</a>        
-            
-            <img src="HEXagon.png" alt="Hex" style="height: 30px; width: 30px;" id="addHexTokenButton"> <a href="https://Hex.com">| Hex |</a>
-            <a href="createStake.html">Stake Hex</a>
-            <!-- Add more navigation links as needed -->
-        </nav>
-        
-        <div class="whitepaper">
-            <h1>HexRewards White Paper</h1>
-            
-            <!-- Paste your white paper content here -->
-            <div class="whitepaper">
-    <h2>HexRewards - A Rewarding Experience for Hex Stakers</h2>
+    <nav>
+        <a href="index.html">| Home </a>
+        <a href="whitepaper.html">| White Paper</a>
+        <a href="slow.html">| Single-Stake-Query |</a>        
+        <img src="HEXagon.png" alt="Hex" style="height: 30px; width: 30px;" id="addHexTokenButton"> <a href="https://Hex.com">| Hex |</a>
+        <a href="createStake.html">Stake Hex</a>
+    </nav>
 
-    <h2>Introduction (NOTE: this white paper is a work in progress.)</h2>
+    <div class="whitepaper">
+        <h1>HexRewards White Paper</h1>
+        <div class="whitepaper-content">
+            <!-- Add your white paper content here -->
+            <!-- For example: -->
+            <h2>HexRewards - A Rewarding Experience for Hex Stakers</h2>
+            <h2>Introduction (NOTE: this white paper is a work in progress.)</h2>
     <p>
         HexRewards is an innovative smart contract designed to provide additional 
         incentives for Hex stakers. By leveraging the power of the Hex staking system, 
