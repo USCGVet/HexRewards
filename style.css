@@ -1,4 +1,4 @@
-
+/* General styles for the body */
 body {
   font-family: Arial, sans-serif;
   background-color: #0c1226;
@@ -7,6 +7,7 @@ body {
   padding: 0;
 }
 
+/* Header styling */
 header {
   display: flex;
   justify-content: space-between;
@@ -15,6 +16,7 @@ header {
   padding: 20px;
 }
 
+/* Logo styling */
 .logo {
   display: flex;
   align-items: center;
@@ -26,6 +28,7 @@ header {
   margin-right: 10px;
 }
 
+/* Container styling */
 .container {
   max-width: 95%;
   margin: 0 auto;
@@ -34,10 +37,12 @@ header {
   justify-content: center;
 }
 
+/* Heading colors */
 h1, h2 {
   color: #7289da;
 }
 
+/* Button styling */
 button {
   background-color: #7289da;
   color: #ffffff;
@@ -53,6 +58,7 @@ button:hover {
   background-color: #5a6fc7;
 }
 
+/* Input styling */
 input {
   background-color: #1e2233;
   color: #ffffff;
@@ -62,35 +68,18 @@ input {
   border-radius: 5px;
 }
 
+/* Horizontal rule styling */
 hr {
   border: 1px solid #7289da;
 }
 
+/* Table styling */
 table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
   background-color: #1e2233;
   padding: 20px;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-}
-
-.logo img {
-  width: 50px;
-  height: 50px;
-  margin-right: 10px;
-}
-
-.container {
-  max-width: 95%;
-  margin: 0 auto;
-  padding: 20px;
-  border-radius: 5px;
-  overflow: hidden;
 }
 
 th, td {
@@ -106,6 +95,7 @@ th {
   text-transform: uppercase;
 }
 
+/* Header right section */
 .header-right {
   display: flex;
   align-items: center;
@@ -115,10 +105,12 @@ th {
   margin-left: 20px;
 }
 
+/* Token balance header */
 #tokenBalanceHeader {
   margin-left: 20px;
 }
 
+/* Stake list styling */
 #stakeList {
   width: 100%;
   overflow-x: auto;
@@ -144,6 +136,7 @@ th {
   text-transform: uppercase;
 }
 
+/* Spinner styling */
 .spinner {
   display: none;
   border: 4px solid #f3f3f3;
@@ -160,6 +153,7 @@ th {
   100% { transform: rotate(360deg); }
 }
 
+/* Pagination styling */
 .pagination {
   margin-top: 20px;
   display: flex;
@@ -186,18 +180,32 @@ th {
   background-color: #5a6fc7;
 }
 
+/* Nav link styles in the header */
+header nav a {
+  color: #7289da; /* Link color */
+  text-decoration: none; /* Remove underline */
+  font-size: 16px; /* Font size */
+  display: flex;
+  align-items: center;
+  margin: 0 10px;
+}
+
 header nav a img {
-    height: 30px;
-    width: 30px;
-    margin: 0 10px;
-    transition: opacity 0.3s ease-in-out;
+  height: 30px;
+  width: 30px;
+  margin-right: 10px;
+  transition: opacity 0.3s ease-in-out;
+}
+
+header nav a:hover {
+  color: #5a6fc7; /* Hover color */
 }
 
 header nav a:hover img {
-    opacity: 0.7;
+  opacity: 0.7; /* Image hover effect */
 }
 
-
+/* Stake info styling */
 #stakeInfo {
   display: flex;
   justify-content: center;
@@ -225,63 +233,7 @@ header nav a:hover img {
   padding: 20px;
 }
 
-.logo {
-  display: flex;
-  align-items: center;
-}
-
-.logo img {
-  width: 50px;
-  height: 50px;
-  padding: 20px;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-}
-
-.logo img {
-  width: 50px;
-  height: 50px;
-  margin-right: 10px;
-}
-
-.container {
-  max-width: 95%;
-  margin: 0 auto;
-  padding: 20px;
-  margin-right: 10px;
-}
-
-.container {
-  max-width: 95%;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-#stakeInfo td {
-  white-space: nowrap;
-}
-  padding: 20px;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-}
-
-.logo img {
-  width: 50px;
-  height: 50px;
-  margin-right: 10px;
-}
-
-.container {
-  max-width: 95%;
-  margin: 0 auto;
-  padding: 20px;
-
+/* Stake index example */
 .stake-index-example {
   font-size: 16px;
   color: #ffffff;
@@ -289,15 +241,13 @@ header nav a:hover img {
   line-height: 1.5;
 }
 
-/* Change color of hyperlinks */
+/* General link styles */
 a {
-  color: #7289da; /* Change this to your desired color */
+  color: #7289da; /* General link color */
   text-decoration: none; /* Remove underline */
-  font-size: 16px; /* Adjust the font size to match the web page text and increase it a little */
+  font-size: 16px; /* Font size */
 }
 
-/* Change color of hyperlinks on hover */
 a:hover {
-  color: #5a6fc7; /* Change this to your desired color */
+  color: #5a6fc7; /* Hover color */
 }
-
