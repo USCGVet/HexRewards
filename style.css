@@ -71,6 +71,24 @@ table {
   border-collapse: collapse;
   margin-top: 10px;
   background-color: #1e2233;
+  padding: 20px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
+}
+
+.container {
+  max-width: 95%;
+  margin: 0 auto;
+  padding: 20px;
   border-radius: 5px;
   overflow: hidden;
 }
@@ -204,11 +222,65 @@ header nav a:hover img {
   font-weight: bold;
   text-transform: uppercase;
   white-space: nowrap;
+  padding: 20px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  width: 50px;
+  height: 50px;
+  padding: 20px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
+}
+
+.container {
+  max-width: 95%;
+  margin: 0 auto;
+  padding: 20px;
+  margin-right: 10px;
+}
+
+.container {
+  max-width: 95%;
+  margin: 0 auto;
+  padding: 20px;
 }
 
 #stakeInfo td {
   white-space: nowrap;
 }
+  padding: 20px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
+}
+
+.container {
+  max-width: 95%;
+  margin: 0 auto;
+  padding: 20px;
 
 .stake-index-example {
   font-size: 16px;
@@ -216,3 +288,16 @@ header nav a:hover img {
   margin-bottom: 20px;
   line-height: 1.5;
 }
+
+/* Change color of hyperlinks */
+a {
+  color: #7289da; /* Change this to your desired color */
+  text-decoration: none; /* Remove underline */
+  font-size: 16px; /* Adjust the font size to match the web page text and increase it a little */
+}
+
+/* Change color of hyperlinks on hover */
+a:hover {
+  color: #5a6fc7; /* Change this to your desired color */
+}
+ 
