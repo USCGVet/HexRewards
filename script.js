@@ -265,7 +265,7 @@ async function displayStakeList(stakeList) {
 
     const table = document.createElement('table');
     const headerRow = document.createElement('tr');
-    const headers = ['Stake ID', 'Staked Hearts', 'Stake Shares', 'Locked Day', 'Staked Days', 'Unlocked Day', 'Auto Stake', 'Consumed Days', 'Early Reward', 'Finished Reward', 'Claimed Reward', 'Register', 'Claim Reward', 'Good Accounting (for 10x Bonus)', 'Return Reward'];
+    const headers = ['Stake ID', 'Staked Hex', 'Stake B-Shares', 'Locked Day', 'Staked Days', 'Consumed Days', 'Early Reward', 'Finished Reward', 'Claimed Reward', 'Register', 'Claim Reward', 'Good Accounting (for 10x Bonus)', 'Return Reward'];
 
     headers.forEach(header => {
       const th = document.createElement('th');
@@ -330,12 +330,11 @@ async function displayStakeList(stakeList) {
       const row = document.createElement('tr');
       const values = [
         stake.stakeId,
-        stake.stakedHearts,
-        stake.stakeShares,
+        formatBigIntWithDecimals(stake.stakedHearts, 8, 3),
+        formatBigIntWithDecimals(stake.stakeShares, 9, 3),
         stake.lockedDay,
         stake.stakedDays,
-        stake.unlockedDay,
-        stake.isAutoStake,
+        //stake.unlockedDay,
         consumedDays,
         web3.utils.fromWei(earlyReward, 'ether'),
         web3.utils.fromWei(finishedReward, 'ether'),
@@ -448,6 +447,14 @@ async function displayStakeList(stakeList) {
   showPage(currentPage);
 }
  
+function formatBigIntWithDecimals(bigInt, divisor, decimalPlaces) {
+  const bigIntString = bigInt.toString();
+  const length = bigIntString.length;
+  const integerPart = bigIntString.slice(0, length - divisor);
+  const fractionalPart = bigIntString.slice(length - divisor);
+  const formattedString = `${integerPart}.${fractionalPart.slice(0, decimalPlaces)}`;
+  return parseFloat(formattedString).toFixed(decimalPlaces);
+}
 
 async function loadHexABI() {
   try {
