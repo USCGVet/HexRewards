@@ -547,6 +547,22 @@ async function addHexTokenToMetaMask() {
 }  
 
 
+// Get the video container and toggle button elements
+const videoContainer = document.getElementById('videoContainer');
+const toggleVideoBtn = document.getElementById('toggleVideoBtn');
+
+// Function to toggle the visibility of the video container
+function toggleVideoVisibility() {
+  if (videoContainer.style.display === 'none') {
+    videoContainer.style.display = 'block';
+  } else {
+    videoContainer.style.display = 'none';
+  }
+}
+
+// Add a click event listener to the toggle button
+toggleVideoBtn.addEventListener('click', toggleVideoVisibility);
+
 document.getElementById('connectButton').addEventListener('click', connectToMetaMask);
 document.getElementById('addTokenButton').addEventListener('click', addTokenToMetaMask);
 document.getElementById('addHexTokenButton').addEventListener('click', addHexTokenToMetaMask);
