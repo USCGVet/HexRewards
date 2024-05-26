@@ -553,10 +553,11 @@ const toggleVideoBtn = document.getElementById('toggleVideoBtn');
 
 // Function to toggle the visibility of the video container
 function toggleVideoVisibility() {
-  if (videoContainer.style.display === 'none') {
-    videoContainer.style.display = 'block';
-  } else {
-    videoContainer.style.display = 'none';
+  videoContainer.classList.toggle('hidden');
+  
+  // Check if the container is visible and reload the Twitter widget
+  if (!videoContainer.classList.contains('hidden')) {
+    twttr.widgets.load();
   }
 }
 
