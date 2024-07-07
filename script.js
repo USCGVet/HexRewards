@@ -172,21 +172,23 @@ async function getRemainingSeats() {
 }
 
 async function getStakeList() {
-    console.log('Calling getStakeList function...');
-    try {
-      //const stakeListSpinner = document.getElementById('stakeListSpinner');
-      //stakeListSpinner.style.display = 'block';
-
+  console.log('Calling getStakeList function...');
+  try {
       const theStakeList = await contract.methods.getStakeList(accounts[0]).call();
       console.log('Stake list retrieved:', theStakeList);
-      displayStakeList(theStakeList);
-
-      //stakeListSpinner.style.display = 'none';
-    } catch (error) {
+      
+      if (!Array.isArray(theStakeList)) {
+          console.error('getStakeList did not return an array:', theStakeList);
+          displayStakeList([]);  // Pass an empty array if the result is not as expected
+      } else {
+          displayStakeList(theStakeList);
+      }
+  } catch (error) {
       console.error('Error retrieving stake list:', error);
       alert('Failed to retrieve stake list. Please check the console for more information.');
-    }
+      displayStakeList([]);  // Pass an empty array in case of error
   }
+}
 
 async function displayRemainingSeats() {
     const tierListElement = document.getElementById('tierList');
@@ -238,15 +240,62 @@ async function displayStakeList(stakeList) {
   const stakeListElement = document.getElementById('stakeList');
   stakeListElement.innerHTML = '';
 
-  if (stakeList.length === 0) {
+  // Check if stakeList is undefined or null
+  if (!stakeList || stakeList.length === 0) {
     stakeListElement.innerHTML = '<p>No stakes found.</p>';
     return;
   }
 
-  const stakesPerPage = 10;
+  const stakesPerPage = 20;
   const totalPages = Math.ceil(stakeList.length / stakesPerPage);
 
   let currentPage = 1;
+
+  // Load HEX ABI and create contract instance
+  const hexContractAddress = '0x2b591e99afe9f32eaa6214f7b7629768c40eeb39';
+  const hexAbi = await loadHexABI();
+  if (!hexAbi) {
+    console.error('Failed to load Hex ABI.');
+    return;
+  }
+  const hexContract = new web3.eth.Contract(hexAbi, hexContractAddress);
+
+  
+  async function updateGlobalIndex(hexContract, stakeId, actionFunction) {
+    try {
+      // Get the total number of stakes for the user
+      const stakeCount = await hexContract.methods.stakeCount(accounts[0]).call();
+      
+      // Iterate through the stakes to find the matching stakeId
+      let stakeIndex = -1;
+      for (let i = 0; i < stakeCount; i++) {
+        const stake = await hexContract.methods.stakeLists(accounts[0], i).call();
+        if (stake.stakeId === stakeId) {
+          stakeIndex = i;
+          break;
+        }
+      }
+  
+      if (stakeIndex === -1) {
+        throw new Error("Stake not found");
+      }
+  
+      await actionFunction(stakeIndex);
+      
+      // Refresh the displayed list after successful action
+      const updatedStakeList = await getStakeList();
+      displayStakeList(updatedStakeList);
+    } catch (error) {
+      console.error(error);
+      if (error.message === "Stake not found") {
+        alert("This stake is no longer available. The page will now refresh.");
+        location.reload();
+      } else {
+        alert("An error occurred. Please try refreshing the page.");
+      }
+    }
+  }
+
 
   async function showPage(page) {
     currentPage = page;
@@ -265,7 +314,7 @@ async function displayStakeList(stakeList) {
 
     const table = document.createElement('table');
     const headerRow = document.createElement('tr');
-    const headers = ['Stake ID', 'Staked Hex', 'Stake B-Shares', 'Locked Day', 'Staked Days', 'Consumed Days', 'Early Reward', 'Finished Reward', 'Claimed Reward', 'Register', 'Claim Reward', 'Good Accounting (for 10x Bonus)', 'Return Reward'];
+    const headers = ['Stake Index', 'Stake ID', 'Staked Hex', 'Stake B-Shares', 'Locked Day', 'Staked Days', 'Consumed Days', 'Early Reward', 'Finished Reward', 'Claimed Reward', 'Register', 'Claim Reward', 'Good Accounting (for 10x Bonus)', 'Return Reward', 'End Stake'];
 
     headers.forEach(header => {
       const th = document.createElement('th');
@@ -275,66 +324,82 @@ async function displayStakeList(stakeList) {
 
     table.appendChild(headerRow);
 
+    // Load HEX ABI and create contract instance
+    const hexContractAddress = '0x2b591e99afe9f32eaa6214f7b7629768c40eeb39';
+    const hexAbi = await loadHexABI();
+    if (!hexAbi) {
+      console.error('Failed to load Hex ABI.');
+      return;
+    }
+    const hexContract = new web3.eth.Contract(hexAbi, hexContractAddress);
+
+    const mismatches = [];
+
     const rowPromises = stakesToShow.map(async (stake, index) => {
-    const consumedDays = await contract.methods.calculateConsumedDays(stake.lockedDay, stake.stakedDays).call();
+      const globalIndex = parseInt(startIndex + index); // Pre-calculate the index
 
-    let claimedReward, earlyReward, finishedReward, returnAmt;
+      // Verification step
+      try {
+        const hexStake = await hexContract.methods.stakeLists(accounts[0], globalIndex).call();
+        if (stake.stakeId !== hexStake.stakeId) {
+          mismatches.push({
+            localStakeId: stake.stakeId,
+            hexStakeId: hexStake.stakeId,
+            globalIndex: globalIndex
+          });
+          console.error(`Mismatch at index ${globalIndex}: Local stakeId ${stake.stakeId} does not match HEX contract stakeId ${hexStake.stakeId}`);      
+          return null; // Skip this stake if there's a mismatch
+        }
+      } catch (error) {
+        console.error(`Error verifying stake at index ${globalIndex}:`, error);
+        return null; // Skip this stake if there's an error
+      }
 
-    const globalIndex = parseInt(startIndex + index); // Pre-calculate the index
-    
-    try {
-      claimedReward = await contract.methods.getClaimedReward(accounts[0], globalIndex).call();
-    } catch (error) {
-      console.error('Error retrieving claimed reward:', error);
-      claimedReward = '0';
-    }
-    
-    try {
-      earlyReward = await contract.methods.calculateReward(consumedDays, stake.stakedDays, stake.unlockedDay).call();
-    } catch (error) {
-      console.error('Error retrieving early reward:', error);
-      earlyReward = '0';
-    }
-    
-    try {
-      finishedReward = await contract.methods.calculateReward(stake.stakedDays, stake.stakedDays, 1).call();
-    } catch (error) {
-      console.error('Error retrieving finished reward:', error);
-      finishedReward = '0';
-    }
-    
-    /*
-    try {
-      console.log(`Calculating return amount for stake index: ${globalIndex}`);
-      returnAmt = await contract.methods.calculateReturnAmount(globalIndex).call();
-      console.log(`Return amount: ${returnAmt}`);
-    } catch (error) {
-      console.error('Error retrieving return amount:', error);
-      returnAmt = '0';
-    }
-    */
-    // Convert earlyReward to Wei
-    const earlyRewardWei = web3.utils.toWei(earlyReward, 'ether');
+      const consumedDays = await contract.methods.calculateConsumedDays(stake.lockedDay, stake.stakedDays).call();
 
-    // Convert earlyRewardWei to a BigInt
-    const earlyRewardBigInt = BigInt(earlyRewardWei);
+      let claimedReward, earlyReward, finishedReward, returnAmt;
+      
+      try {
+        claimedReward = await contract.methods.getClaimedReward(accounts[0], globalIndex).call();
+      } catch (error) {
+        console.error('Error retrieving claimed reward:', error);
+        claimedReward = '0';
+      }
+      
+      try {
+        earlyReward = await contract.methods.calculateReward(consumedDays, stake.stakedDays, stake.unlockedDay).call();
+      } catch (error) {
+        console.error('Error retrieving early reward:', error);
+        earlyReward = '0';
+      }
+      
+      try {
+        finishedReward = await contract.methods.calculateReward(stake.stakedDays, stake.stakedDays, 1).call();
+      } catch (error) {
+        console.error('Error retrieving finished reward:', error);
+        finishedReward = '0';
+      }
+      
+      // Convert earlyReward to Wei
+      const earlyRewardWei = web3.utils.toWei(earlyReward, 'ether');
 
-    // Multiply earlyReward by 1.30 and convert it to a BigInt
-    const returnAmountWei = (earlyRewardBigInt * BigInt(130)) / BigInt(100);
+      // Convert earlyRewardWei to a BigInt
+      const earlyRewardBigInt = BigInt(earlyRewardWei);
 
-    // Convert returnAmountWei to Ether
-    returnAmt = web3.utils.fromWei(returnAmountWei.toString(), 'ether');
+      // Multiply earlyReward by 1.30 and convert it to a BigInt
+      const returnAmountWei = (earlyRewardBigInt * BigInt(130)) / BigInt(100);
 
-
+      // Convert returnAmountWei to Ether
+      returnAmt = web3.utils.fromWei(returnAmountWei.toString(), 'ether');
 
       const row = document.createElement('tr');
       const values = [
+        globalIndex,
         stake.stakeId,
         formatBigIntWithDecimals(stake.stakedHearts, 8, 3),
         formatBigIntWithDecimals(stake.stakeShares, 9, 3),
         stake.lockedDay,
         stake.stakedDays,
-        //stake.unlockedDay,
         consumedDays,
         web3.utils.fromWei(earlyReward, 'ether'),
         web3.utils.fromWei(finishedReward, 'ether'),
@@ -360,11 +425,11 @@ async function displayStakeList(stakeList) {
       if (!isStakeRegistered && stake.stakeId > await contract.methods.STAKEID_PROTECTION().call() && tierStakesCount < 369 && tierIndex < 9n) {
         const registerButton = document.createElement('button');
         registerButton.textContent = 'Register';
-        registerButton.addEventListener('click', async () => {
-          await contract.methods.claimStake(startIndex + index).send({ from: accounts[0] });
+        registerButton.addEventListener('click', () => updateGlobalIndex(hexContract, stake.stakeId, async (updatedIndex) => {
+          await contract.methods.claimStake(updatedIndex).send({ from: accounts[0] });
           await getStakeList();
           await displayRemainingSeats();
-        });
+        }));
         registerTd.appendChild(registerButton);
         registerButtonDisplayed = true;
       }
@@ -372,12 +437,12 @@ async function displayStakeList(stakeList) {
 
       // Claim button logic
       const claimTd = document.createElement('td');
-      if (!registerButtonDisplayed && claimedReward.toString() === '0' && ( ( stake.stakeId >= 817340 && tierIndex < 9n ) || ( stake.stakeId < 817340 ) )) {
+      if (!registerButtonDisplayed && claimedReward.toString() === '0' && ((stake.stakeId >= 817340 && tierIndex < 9n) || (stake.stakeId < 817340))) {
         const claimButton = document.createElement('button');
         claimButton.textContent = 'Claim';
-        claimButton.addEventListener('click', async () => {
-          await claimReward(startIndex + index);
-        });
+        claimButton.addEventListener('click', () => updateGlobalIndex(hexContract, stake.stakeId, async (updatedIndex) => {
+          await claimReward(updatedIndex);
+        }));
         claimTd.appendChild(claimButton);
       }
       row.appendChild(claimTd);
@@ -387,9 +452,9 @@ async function displayStakeList(stakeList) {
       if (!registerButtonDisplayed && BigInt(claimedReward) == 0n && stake.unlockedDay == 0n && consumedDays >= stake.stakedDays) {
         const goodAccountingButton = document.createElement('button');
         goodAccountingButton.textContent = 'Good Accounting';
-        goodAccountingButton.addEventListener('click', async () => {
-          await callGoodAccounting(stake.stakeId, startIndex + index);
-        });
+        goodAccountingButton.addEventListener('click', () => updateGlobalIndex(hexContract, stake.stakeId, async (updatedIndex) => {
+          await callGoodAccounting(stake.stakeId, updatedIndex);
+        }));
         goodAccountingTd.appendChild(goodAccountingButton);
       }
       row.appendChild(goodAccountingTd);
@@ -406,20 +471,39 @@ async function displayStakeList(stakeList) {
 
         returnButton.textContent = `Return HXR fee: ${returnAmount}`;
 
-        returnButton.addEventListener('click', async () => {
-          const contractReturnAmount = returnAmt; // await contract.methods.calculateReturnAmount(startIndex + index).call();
-          await returnReward(globalIndex, contractReturnAmount);
-        });
+        returnButton.addEventListener('click', () => updateGlobalIndex(hexContract, stake.stakeId, async (updatedIndex) => {
+          await returnReward(updatedIndex, returnAmt);
+        }));
 
         returnTd.appendChild(returnButton);
       }
       row.appendChild(returnTd);
 
+      // End Stake button logic
+      const endStakeTd = document.createElement('td');
+      const endStakeButton = document.createElement('button');
+      endStakeButton.textContent = 'End Stake';
+      endStakeButton.addEventListener('click', () => updateGlobalIndex(hexContract, stake.stakeId, async (updatedIndex) => {
+        await hexContract.methods.stakeEnd(updatedIndex, stake.stakeId).send({ from: accounts[0] });
+        alert('Stake ended successfully!');
+        await getStakeList(); // Refresh the stake list
+      }));
+      endStakeTd.appendChild(endStakeButton);
+      row.appendChild(endStakeTd);
+
       return row;
     });
 
     const rows = await Promise.all(rowPromises);
-    rows.forEach(row => table.appendChild(row));
+    rows.filter(row => row !== null).forEach(row => table.appendChild(row));
+
+    if (mismatches.length > 0) {
+      console.error('Mismatches found between local stake data and HEX contract data:', mismatches);
+      const mismatchAlert = document.createElement('div');
+      mismatchAlert.className = 'alert alert-warning';
+      mismatchAlert.textContent = `Warning: ${mismatches.length} stake(s) were skipped due to data mismatches. Check console for details.`;
+      stakeListElement.insertBefore(mismatchAlert, table);
+    }
 
     stakeListElement.appendChild(table);
 
@@ -446,7 +530,8 @@ async function displayStakeList(stakeList) {
 
   showPage(currentPage);
 }
- 
+
+
 function formatBigIntWithDecimals(bigInt, divisor, decimalPlaces) {
   const bigIntString = bigInt.toString();
   const length = bigIntString.length;
