@@ -28,13 +28,26 @@ header {
   margin-right: 10px;
 }
 
+
 /* Container styling */
 .container {
   max-width: 95%;
   margin: 0 auto;
   padding: 20px;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
+}
+
+/* Specific styling for mainContent divs */
+#mainContent0, #mainContent0a, #mainContent1 {
+  width: 100%; /* Ensure full width */
+  margin-left: 0; /* Remove any left margin */
+  text-align: left; /* Align text to the left */
+}
+
+/* If you want some padding from the left edge of the page */
+#mainContent0, #mainContent0a, #mainContent1 {
+  padding-left: 20px; /* Adjust as needed */
 }
 
 /* Heading colors */
