@@ -19,28 +19,30 @@
       <div id="networkInfo"></div>
     </div>
   </header>
-
-  <div class="container">
+  <div class="container" id="mainContent0">
     <nav>
-            <a href="index.html">| Home </a>
-            <a href="whitepaper.html">| White Paper</a>
-            <a href="slow.html">| Single-Stake-Query |</a>
-            
-            
-            <img src="HEXagon.png" alt="Hex" style="height: 30px; width: 30px;" id="addHexTokenButton"> <a href="https://Hex.com">| Hex |</a>
-            <a href="createStake.html">Stake Hex</a>
-            <!-- Add more navigation links as needed -->
-            <a href="stake-report.html">| Stake-Report |</a>
-        </nav>
+        <a href="index.html">| Home </a>
+        <a href="whitepaper.html">| White Paper |</a>        
+        
+        
+        <img src="HEXagon.png" alt="Hex" style="height: 30px; width: 30px;" id="addHexTokenButton"> <a href="https://Hex.com">| Hex |</a>
+        <a href="createStake.html">Stake Hex</a>
+        <!-- Add more navigation links as needed -->
+        <a href="stake-report.html">| Stake-Report |</a>
+    </nav>       
+  </div>
+  <div class="container">
+    
+    <div > 
+        <h2>Create Hex Stake</h2>
+        <div>
+        <input type="number" id="stakeAmount" placeholder="Enter stake amount">
+        <input type="number" id="stakeDays" placeholder="Enter stake duration (days)">
+        <button id="createStakeButton">Create Stake</button>
+        </div>
 
-    <h2>Create Hex Stake</h2>
-    <div>
-      <input type="number" id="stakeAmount" placeholder="Enter stake amount">
-      <input type="number" id="stakeDays" placeholder="Enter stake duration (days)">
-      <button id="createStakeButton">Create Stake</button>
+        <div id="transactionStatus"></div>
     </div>
-
-    <div id="transactionStatus"></div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
