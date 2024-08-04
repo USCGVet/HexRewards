@@ -47,13 +47,14 @@ async function connectToMetaMask() {
   }
 }
 
+/*
 async function checkAndConnectToMetaMask() {
   const isConnected = localStorage.getItem('isMetaMaskConnected');
   if (isConnected === 'true') {
     await connectToMetaMask();
   }
 }
-
+*/
 async function getTotalTokenSupply() {
     try {
         const totalSupply = await contract.methods.totalSupply().call();
@@ -654,4 +655,4 @@ document.getElementById('addTokenButton').addEventListener('click', addTokenToMe
 document.getElementById('addHexTokenButton').addEventListener('click', addHexTokenToMetaMask);
 
 // Call the checkAndConnectToMetaMask function when the page loads
-window.addEventListener('load', checkAndConnectToMetaMask);
+//window.addEventListener('load', checkAndConnectToMetaMask);
