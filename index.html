@@ -1,96 +1,134 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HexRewards</title>
-    <link rel="stylesheet" href="style.css?v=2">
-    <link rel="icon" href="favicon.ico?v=4" type="image/x-icon">
-    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HexRewards</title>
+
+  <!-- Original Styles -->
+  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="icon" href="favicon.ico?v=4" type="image/x-icon">
+
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+
+
+  <!-- DataTables + jQuery CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+  <!-- Optionally, you can include your own DataTable styling -->
+  <link rel="stylesheet" href="datatable-style.css">
+
+  <!-- Updated Google Fonts, or any you want -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap"
+    rel="stylesheet"
+  >
 </head>
 <body>
-    <header>
-        <div class="logo">
-            <img src="logo-nobackground-1000.png" alt="HexRewards Logo" id="addTokenButton">
-            <h1>HexRewards</h1>
-        </div>
-        <div class="header-right">            
-            <div id="tokenBalanceHeader" style="display: none;">
-                <h2>
-                    <p id="totalTokenSupply"></p>
-                    <div id="tokenBalance"></div>
-                </h2>
-            </div>            
-        </div>
-        <button id="connectButton">Connect to MetaMask</button>
-        <div class="header-right" id="connectAddr" style="display: none;">
-            <div id="accountInfo"></div>  
-            <div id="networkInfo"></div>           
-        </div>
-         <nav>
-                <!-- Twitter Link -->
-                <a href="https://twitter.com/uscgvet5555" target="_blank" title="Follow on X (Twitter)">
-                    <img src="logo-white.png" alt="Twitter"> Twitter
-                </a>
-                <!-- Telegram Link -->
-                <a href="https://t.me/USCG_Vet_Chat" target="_blank" title="Join Telegram Group">
-                    <img src="logo-nobackground-1000.png" alt="Telegram"> Telegram
-                </a>
-        </nav>
-    </header>
-    <div class="container" id="mainContent0">
-        <nav>
-            <a href="index.html">| Home </a>
-            <a href="whitepaper.html">| White Paper |</a>            
-            
-            
-            <img src="HEXagon.png" alt="Hex" style="height: 30px; width: 30px;" id="addHexTokenButton"> <a href="https://Hex.com">| Hex |</a>
-            <a href="createStake.html">Stake Hex</a>
-            <!-- Add more navigation links as needed -->
-            <a href="stake-report.html">| Stake-Report |</a>
-        </nav>       
+  <header>
+    <div class="logo">
+      <img src="logo-nobackground-1000.png" alt="HexRewards Logo" id="addTokenButton">
+      <h1>HexRewards</h1>
     </div>
+    <div class="header-right">
+      <div id="tokenBalanceHeader" style="display: none;">
+        <h2>
+          <p id="totalTokenSupply"></p>
+          <div id="tokenBalance"></div>
+        </h2>
+      </div>
+    </div>
+    <button id="connectButton">Connect to MetaMask</button>
+    <div class="header-right" id="connectAddr" style="display: none;">
+      <div id="accountInfo"></div>
+      <div id="networkInfo"></div>
+    </div>
+    <nav>
+      <!-- Twitter Link -->
+      <a href="https://twitter.com/uscgvet5555" target="_blank" title="Follow on X (Twitter)">
+        <img src="logo-white.png" alt="Twitter"> Twitter
+      </a>
+      <!-- Telegram Link -->
+      <a href="https://t.me/USCG_Vet_Chat" target="_blank" title="Join Telegram Group">
+        <img src="logo-nobackground-1000.png" alt="Telegram"> Telegram
+      </a>
+    </nav>
+  </header>
+  <div class="container" id="mainContent0">
+    <nav>
+      <a href="index.html">| Home </a>
+      <a href="whitepaper.html">| White Paper |</a>
+      <img
+        src="HEXagon.png"
+        alt="Hex"
+        style="height: 30px; width: 30px;"
+        id="addHexTokenButton"
+      >
+      <a href="https://Hex.com">| Hex |</a>
+      <a href="createStake.html">Stake Hex</a>
+      <a href="stake-report.html">| Stake-Report |</a>
+    </nav>
+  </div>
 
-    <div class="container" id="mainContent0a">
+  <div class="container" id="mainContent0a">
     <!-- Add a button to toggle the video container -->
     <button id="toggleVideoBtn">Toggle Media</button>
+  </div>
+
+  <!-- OPTIONAL: Hide or show via script if you want -->
+  <div class="container" id="mainContent1">
+    <div class="video-container" id="videoContainer">
+      <div class="youtube-video">
+        <iframe
+          width="560"
+          height="315"
+          src="https://www.youtube.com/embed/EGYdhqxkZLA"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+      <div class="twitter-post">
+        <blockquote class="twitter-tweet" data-theme="dark">
+          <p lang="en" dir="ltr">
+            Check out this amazing video!
+            <a href="https://twitter.com/i/status/1789525054646104551">
+              https://twitter.com/i/status/1789525054646104551
+            </a>
+          </p>
+          &mdash;
+          <a href="https://twitter.com/PulseChainConf/status/1789525054646104551">
+            May 25, 2024
+          </a>
+        </blockquote>
+        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      </div>
     </div>
+  </div>
 
-    <div class="container" id="mainContent1">
-       
+  <!-- Main container that will display stake data -->
+  <div class="container" id="mainContent" style="display: none;">
+    <h2>Stake List</h2>
+    <!-- A table for DataTables to populate -->
+    <table id="stakeList" class="display" style="width:100%">
+      <!-- DataTable will populate everything -->
+    </table>
 
-        <!-- Add the collapsible video container -->
-        <div class="video-container" id="videoContainer">
-          <div class="youtube-video">
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/EGYdhqxkZLA" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-          </div>
-          <div class="twitter-post">
-            <blockquote class="twitter-tweet" data-theme="dark">
-              <p lang="en" dir="ltr">
-                Check out this amazing video! <a href="https://twitter.com/i/status/1789525054646104551">https://twitter.com/i/status/1789525054646104551</a>
-              </p>
-              &mdash;  <a href="https://twitter.com/PulseChainConf/status/1789525054646104551">May 25, 2024</a>
-            </blockquote>
-            <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-          </div>
-        </div>
+    <h2>New Hex Stake Registration Tiers - Seats Left (only required for Hex StakeIDs > 817340)</h2>
+    <div id="tierList"></div>
+  </div>
 
-    </div>   
-    <div class="container" id="mainContent" style="display: none;">
-        
+  <div class="container" id="spinnerContent">
+    <div id="stakeListSpinner" class="spinner"></div>
+  </div>
 
-        <h2>Stake List</h2>
-        <div id="stakeList"></div>
+  <!-- jQuery (needed for older DataTables) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- DataTables JS -->
+  <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 
-        <h2>New Hex Stake Registration Tiers - Seats Left (only required for Hex StakeIDs > 817340)</h2>
-        <div id="tierList"></div>
-    </div>
-    <div class="container" id="spinnerContent" >
-        <div id="stakeListSpinner" class="spinner"></div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>    
-    <script src="script.js?v=5564" type="module"></script>
+  <!-- Your existing scripts -->
+  <script src="script.js?v=5564" type="module"></script>
 </body>
 </html>
