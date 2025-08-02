@@ -204,9 +204,75 @@
             for the same stake, as long as it is active (not ended), allowing you to optimize your reward strategy
             based on stake progress and changes in your investment approach.</p>
    
+    <h2>7. Important: Index Management and Stake Protection</h2>
+    <h3>7.1 Understanding the Interaction</h3>
+    <p>
+        There is a critical interaction issue between HEX's stake management system and HexRewards' reward tracking mechanism. This issue stems from how HEX manages its stake array and how HexRewards tracks claimed rewards.
+    </p>
+    
+    <h3>7.2 How HEX Manages Stakes</h3>
+    <p>
+        When you end a stake in HEX, the contract uses a "pop-and-swap" mechanism for efficiency:
+    </p>
+    <ul>
+        <li>The ended stake is removed from its position in the array</li>
+        <li>The LAST stake in your array is moved to fill the gap</li>
+        <li>This changes the index positions of stakes</li>
+    </ul>
+    
+    <h3>7.3 The Problem</h3>
+    <p>
+        HexRewards tracks claimed rewards by stake index: <code>mapping(address => mapping(uint256 => uint256)) claimed</code>
+    </p>
+    <p>
+        When a stake moves to a new index position due to pop-and-swap, it may inherit the claim status of the previous stake at that index. This can result in:
+    </p>
+    <ul>
+        <li>Stakes appearing as "already claimed" when they haven't claimed any rewards</li>
+        <li>Loss of ability to claim legitimate rewards</li>
+        <li>Valuable stakes (including 5555-day stakes) becoming "contaminated"</li>
+    </ul>
+    
+    <h3>7.4 The Sacrificial Stake Solution</h3>
+    <p>
+        <strong>Before ending any stake (except your last one), create a "sacrificial" stake:</strong>
+    </p>
+    <ol>
+        <li>Create a minimal HEX stake (minimum amount based on current shareRate, typically ~0.1-1 HEX)</li>
+        <li>Stake for just 1 day</li>
+        <li>This becomes your new "last stake"</li>
+        <li>When you end another stake, the sacrificial stake gets moved via pop-and-swap</li>
+        <li>Your valuable stakes remain in their positions, preserving their reward eligibility</li>
+    </ol>
+    
+    <h3>7.5 Implementation in the UI</h3>
+    <p>
+        The HexRewards interface includes automatic protection:
+    </p>
+    <ul>
+        <li><strong>Orange Warning:</strong> Appears when ending a stake would affect a valuable stake</li>
+        <li><strong>One-Click Solution:</strong> "Create Sacrificial Stake" button automatically creates the minimum stake needed</li>
+        <li><strong>Smart Detection:</strong> Only warns when the last stake has unclaimed HexRewards value</li>
+    </ul>
+    
+    <h3>7.6 Best Practices</h3>
+    <ul>
+        <li>Always maintain a small sacrificial stake as your last stake</li>
+        <li>Before ending stakes, check if your last stake has value</li>
+        <li>Use the automated protection system in the UI</li>
+        <li>Remember: losing 0.1 HEX is better than losing rewards on 50,000 HEX</li>
+    </ul>
+    
+    <div style="background-color: #fff3cd; border: 2px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 5px; color: #000000;">
+        <strong>⚠️ Warning:</strong> This is not a bug in HexRewards itself, but rather an unavoidable interaction between HEX's efficient array management and HexRewards' index-based tracking. The sacrificial stake workaround is currently the best solution to protect your valuable stakes.
+    </div>
+
     <h2>Conclusion</h2>
     <p>
         HexRewards offers an exciting opportunity for Hex stakers to earn additional rewards based on their staking activity. With its tiered system, stake protection, and flexible reward calculation, HexRewards aims to incentivize long-term staking and provide a rewarding experience for users. By leveraging the power of smart contracts and the Hex staking system, HexRewards seeks to enhance the value proposition for Hex stakers and contribute to the growth and adoption of the Hex ecosystem.
+    </p>
+    <p>
+        Users should be aware of the pop-and-swap interaction and use the provided protection mechanisms to ensure they can always claim their earned rewards. The small cost of maintaining a sacrificial stake is negligible compared to the potential loss of rewards on larger stakes.
     </p>
 
 </div>

@@ -1,0 +1,15 @@
+node_modules
+scripts
+cache
+.claude
+HHTestAccounts.txt
+package-lock.json
+package.json
+hardhat.config.js
+contracts
+artifacts
+typechain-types
+hardhat-node.config.js
+check-time.bat
+advance-time.bat
+advance-time.sh

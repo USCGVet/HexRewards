@@ -1,4 +1,5 @@
-const contractAddress = '0xCfCb89f00576A775d9f81961A37ba7DCf12C7d9B'; //PROD = 0xCfCb89f00576A775d9f81961A37ba7DCf12C7d9B DEV = 0x1d460d731Bd5a0fF2cA07309dAEB8641a7b175A1
+// Contract address will be set dynamically based on network
+let contractAddress;
 const MAX_STAKES_PER_TIER = 369;
 
 let web3, contract, abi;
@@ -16,6 +17,11 @@ async function loadABI() {
 async function initWeb3() {
     if (typeof window.ethereum !== 'undefined') {
         web3 = new Web3(window.ethereum);
+        
+        // Get configuration based on current network
+        const config = await getConfig();
+        contractAddress = config.hexRewardsAddress;
+        
         contract = new web3.eth.Contract(abi, contractAddress);
     } else {
         alert('Please install MetaMask to use this dApp!');

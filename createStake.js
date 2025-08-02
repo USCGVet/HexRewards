@@ -1,4 +1,5 @@
-const hexContractAddress = '0x2b591e99afe9f32eaa6214f7b7629768c40eeb39'; // Replace with the actual Hex contract address
+// Contract address will be set dynamically based on network
+let hexContractAddress;
 
 let web3, hexContract, accounts;
 
@@ -17,6 +18,10 @@ async function connectToMetaMask() {
     if (typeof window.ethereum !== 'undefined') {
       web3 = new Web3(window.ethereum);
       try {
+        // Get configuration based on current network
+        const config = await getConfig();
+        hexContractAddress = config.hexAddress;
+        
         accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         document.getElementById('accountInfo').innerHTML = `Connected: ${accounts[0]}`;
         document.getElementById('connectButton').style.display = 'none';

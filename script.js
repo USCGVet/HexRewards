@@ -1,7 +1,8 @@
 // script.js
 
-// Replace with your actual contract address:
-const contractAddress = '0xCfCb89f00576A775d9f81961A37ba7DCf12C7d9B';
+// Contract addresses will be set dynamically based on network
+let contractAddress;
+let hexContractAddress;
 const MAX_STAKES_PER_TIER = 369;
 
 let web3, contract, accounts, abi;
@@ -22,6 +23,11 @@ async function connectToMetaMask() {
   if (typeof window.ethereum !== 'undefined') {
     web3 = new Web3(window.ethereum);
     try {
+      // Get configuration based on current network
+      const config = await getConfig();
+      contractAddress = config.hexRewardsAddress;
+      hexContractAddress = config.hexAddress;
+      
       accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
       contract = new web3.eth.Contract(abi, contractAddress);
       document.getElementById('accountInfo').innerHTML = `Connected: ${accounts[0]}`;
@@ -59,6 +65,7 @@ async function getNetwork() {
           case '42': networkName = 'Kovan'; break;
           case '369': networkName = 'PulseChain Mainnet'; break;
           case '943': networkName = 'PulseChain Testnet v4'; break;
+          case '31337': networkName = 'Hardhat Local'; break;
           default: networkName = 'Unknown';
         }
         document.getElementById('networkInfo').innerHTML = `Connected: ${networkName}`;
@@ -410,7 +417,6 @@ function wireUpTableButtons() {
     const stakeIndex = $(this).data('stakeIndex');
     const stakeId = $(this).data('stakeId');
     try {
-      const hexContractAddress = '0x2b591e99afe9f32eaa6214f7b7629768c40eeb39';
       const hexAbi = await loadHexABI();
       if (!hexAbi) throw new Error('Failed to load Hex ABI.');
       const hexContract = new web3.eth.Contract(hexAbi, hexContractAddress);
@@ -430,21 +436,331 @@ function wireUpTableButtons() {
   table.off('click', '.end-btn').on('click', '.end-btn', async function () {
     const stakeIndex = $(this).data('stakeIndex');
     const stakeId = $(this).data('stakeId');
-    try {
-      const hexContractAddress = '0x2b591e99afe9f32eaa6214f7b7629768c40eeb39';
-      const hexAbi = await loadHexABI();
-      if (!hexAbi) {
-        alert('Failed to load Hex ABI');
-        return;
-      }
-      const hexContract = new web3.eth.Contract(hexAbi, hexContractAddress);
+    
+    // Define the actual end stake function
+    window.proceedWithNormalEndStake = async () => {
+      try {
+        const hexAbi = await loadHexABI();
+        if (!hexAbi) {
+          alert('Failed to load Hex ABI');
+          return;
+        }
+        const hexContract = new web3.eth.Contract(hexAbi, hexContractAddress);
 
-      await hexContract.methods.stakeEnd(stakeIndex, stakeId).send({ from: accounts[0] });
-      alert('Stake ended successfully!');
-      await getStakeList();
-    } catch (error) {
-      console.error(error);
-      alert('Error ending stake. Check console for details.');
+        await hexContract.methods.stakeEnd(stakeIndex, stakeId).send({ from: accounts[0] });
+        alert('Stake ended successfully!');
+        await getStakeList();
+      } catch (error) {
+        console.error(error);
+        alert('Error ending stake. Check console for details.');
+      }
+    };
+    
+    // Get the DataTable instance and row data
+    const dt = table.DataTable();
+    const rowData = dt.row($(this).closest('tr')).data();
+    const consumedDays = rowData.consumedDays;
+    const stakedDays = rowData.stakedDays;
+    
+    // Get all stakes to check the last one
+    const allStakes = dt.rows().data().toArray();
+    const lastStakeIndex = allStakes.length - 1;
+    
+    // Check if ending this stake would cause a pop-swap that affects a valuable stake
+    if (stakeIndex !== lastStakeIndex && allStakes.length > 1) {
+      const lastStake = allStakes[lastStakeIndex];
+      
+      // Check if the last stake has HexRewards value (registered and not yet claimed)
+      // OR if it's a large stake that could be registered
+      const isLastStakeValuable = (lastStake.isRegistered && !lastStake.isClaimed) || 
+                                  (!lastStake.isRegistered && parseFloat(lastStake.stakedHearts) >= 1000);
+      
+      if (isLastStakeValuable) {
+        // Calculate minimum stake amount first
+        let minStakeHex = "calculating...";
+        try {
+          const hexAbi = await loadHexABI();
+          if (hexAbi) {
+            const hexContract = new web3.eth.Contract(hexAbi, hexContractAddress);
+            const globals = await hexContract.methods.globals().call();
+            const shareRate = Number(globals.shareRate);
+            const SHARE_RATE_SCALE = 100000;
+            const minStakeHearts = Math.ceil(shareRate / SHARE_RATE_SCALE) + 1;
+            minStakeHex = (minStakeHearts / 100000000).toFixed(8);
+          }
+        } catch (e) {
+          minStakeHex = "~1";
+        }
+        
+        // Show intervention warning
+        const interventionHtml = `
+          <div style="
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #FFA500;
+            background: linear-gradient(135deg, #FFA500 0%, #FFD700 100%);
+            border: 3px solid #FF6600;
+            border-radius: 15px;
+            padding: 30px;
+            z-index: 10000;
+            box-shadow: 0 0 50px rgba(255, 165, 0, 0.8);
+            max-width: 500px;
+            text-align: center;
+          " id="popSwapWarning">
+            <h2 style="color: #8B0000; margin: 0 0 20px 0; font-size: 32px; text-shadow: 2px 2px 4px rgba(255,255,255,0.5);">
+              🛡️ STAKE PROTECTION WARNING 🛡️
+            </h2>
+            <p style="color: #000000; font-size: 18px; margin: 10px 0; font-weight: bold;">
+              Ending this stake will affect another valuable stake!
+            </p>
+            <div style="background: rgba(255,255,255,0.9); padding: 15px; border-radius: 10px; margin: 20px 0;">
+              <p style="color: #8B0000; font-size: 16px; margin: 5px 0;">
+                <strong>Last Stake Details:</strong>
+              </p>
+              <p style="color: #000000; font-size: 14px; margin: 5px 0;">
+                Stake ID: ${lastStake.stakeId}<br>
+                Amount: ${lastStake.stakedHearts} HEX<br>
+                Duration: ${lastStake.stakedDays} days<br>
+                Potential Reward: ${lastStake.finishedReward} HXR
+              </p>
+            </div>
+            <p style="color: #8B0000; font-size: 16px; margin: 15px 0; font-weight: bold;">
+              This stake will be moved to index ${stakeIndex} and may lose reward eligibility!
+            </p>
+            <div style="background: rgba(255,255,255,0.9); padding: 20px; border-radius: 10px; margin: 15px 0;">
+              <p style="color: #000000; font-size: 16px; margin: 5px 0; font-weight: bold;">
+                💡 Solution: Create a sacrificial stake
+              </p>
+              <p style="color: #8B0000; font-size: 18px; margin: 5px 0; font-weight: bold;">
+                Cost: ${minStakeHex} HEX for 1 day
+              </p>
+              <p style="color: #666666; font-size: 14px; margin: 5px 0 15px 0;">
+                This tiny stake will protect your valuable stakes
+              </p>
+              <button onclick="window.createSacrificialStake()" style="
+                background: #32CD32;
+                color: #FFFFFF;
+                border: none;
+                padding: 12px 30px;
+                font-size: 16px;
+                font-weight: bold;
+                border-radius: 8px;
+                cursor: pointer;
+                width: 100%;
+                box-shadow: 0 4px 15px rgba(50, 205, 50, 0.3);
+                transition: all 0.3s ease;
+              "
+              onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(50, 205, 50, 0.4)'"
+              onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(50, 205, 50, 0.3)'">
+                Create Sacrificial Stake
+              </button>
+            </div>
+            <div style="margin-top: 20px; display: flex; gap: 12px; justify-content: center;">
+              <button onclick="document.getElementById('popSwapWarning').remove(); document.getElementById('popSwapWarningOverlay').remove()" style="
+                background: #4169E1;
+                color: #FFFFFF;
+                border: none;
+                padding: 12px 30px;
+                font-size: 16px;
+                font-weight: bold;
+                border-radius: 8px;
+                cursor: pointer;
+                width: 140px;
+                box-shadow: 0 3px 10px rgba(65, 105, 225, 0.3);
+                transition: all 0.3s ease;
+              "
+              onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 15px rgba(65, 105, 225, 0.4)'"
+              onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 10px rgba(65, 105, 225, 0.3)'">
+                Cancel
+              </button>
+              <button onclick="window.proceedWithPopSwapEnd()" style="
+                background: #DC143C;
+                color: #FFFFFF;
+                border: none;
+                padding: 12px 20px;
+                font-size: 16px;
+                font-weight: bold;
+                border-radius: 8px;
+                cursor: pointer;
+                width: 180px;
+                box-shadow: 0 3px 10px rgba(220, 20, 60, 0.3);
+                transition: all 0.3s ease;
+              "
+              onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 15px rgba(220, 20, 60, 0.4)'"
+              onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 10px rgba(220, 20, 60, 0.3)'">
+                ☠️ Continue End Stake
+              </button>
+            </div>
+          </div>
+          <div id="popSwapWarningOverlay" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+          " onclick="document.getElementById('popSwapWarning').remove(); document.getElementById('popSwapWarningOverlay').remove()"></div>
+        `;
+        
+        $('body').append(interventionHtml);
+        
+        // Define the proceed function for pop-swap warning
+        window.proceedWithPopSwapEnd = async () => {
+          document.getElementById('popSwapWarning').remove();
+          document.getElementById('popSwapWarningOverlay').remove();
+          // Continue with the normal end stake process
+          window.proceedWithNormalEndStake();
+        };
+        
+        // Define function to create sacrificial stake
+        window.createSacrificialStake = async () => {
+          document.getElementById('popSwapWarning').remove();
+          document.getElementById('popSwapWarningOverlay').remove();
+          
+          try {
+            const hexAbi = await loadHexABI();
+            if (!hexAbi) {
+              alert('Failed to load Hex ABI');
+              return;
+            }
+            const hexContract = new web3.eth.Contract(hexAbi, hexContractAddress);
+            
+            // Calculate minimum stake amount based on current shareRate
+            // Formula: newStakeShares = (stakedHearts + bonusHearts) * SHARE_RATE_SCALE / shareRate
+            // We need at least 1 share, and for 1-day stake, bonus is minimal
+            
+            const globals = await hexContract.methods.globals().call();
+            const shareRate = Number(globals.shareRate);
+            const SHARE_RATE_SCALE = 100000; // 1e5 from HEX contract
+            
+            // For minimum calculation, we need: stakedHearts >= shareRate / SHARE_RATE_SCALE
+            // Add a small buffer to ensure we meet minimum
+            const minStakeHearts = Math.ceil(shareRate / SHARE_RATE_SCALE) + 1;
+            const stakeDays = 1;
+            
+            // Convert to HEX for display (8 decimals)
+            const minStakeHex = (minStakeHearts / 100000000).toFixed(8);
+            
+            console.log(`Creating sacrificial stake: ${minStakeHex} HEX for 1 day (shareRate: ${shareRate})`);
+            const tx = await hexContract.methods.stakeStart(minStakeHearts.toString(), stakeDays).send({ 
+              from: accounts[0],
+              gas: 500000 
+            });
+            
+            alert('Sacrificial stake created! You can now safely end your stake.');
+            await getStakeList();
+          } catch (error) {
+            console.error('Failed to create sacrificial stake:', error);
+            alert('Failed to create sacrificial stake. Please try manually from the Stake Hex page.');
+          }
+        };
+        
+        return; // Stop here until user makes a choice
+      }
+    }
+    
+    // Check if stake has NOT served full term
+    if (consumedDays < stakedDays) {
+      // Show bright warning popup for early end stake
+      const daysRemaining = stakedDays - consumedDays;
+      const percentComplete = Math.floor((consumedDays / stakedDays) * 100);
+      
+      const warningHtml = `
+        <div style="
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: #FF0000;
+          background: linear-gradient(135deg, #FF0000 0%, #FF6600 100%);
+          border: 3px solid #FFFF00;
+          border-radius: 15px;
+          padding: 30px;
+          z-index: 10000;
+          box-shadow: 0 0 50px rgba(255, 0, 0, 0.8), 0 0 100px rgba(255, 102, 0, 0.6);
+          max-width: 400px;
+          text-align: center;
+          animation: pulse 1.5s infinite;
+        " id="earlyEndWarning">
+          <style>
+            @keyframes pulse {
+              0% { box-shadow: 0 0 50px rgba(255, 0, 0, 0.8), 0 0 100px rgba(255, 102, 0, 0.6); }
+              50% { box-shadow: 0 0 80px rgba(255, 0, 0, 1), 0 0 150px rgba(255, 102, 0, 0.8); }
+              100% { box-shadow: 0 0 50px rgba(255, 0, 0, 0.8), 0 0 100px rgba(255, 102, 0, 0.6); }
+            }
+          </style>
+          <h2 style="color: #FFFF00; margin: 0 0 20px 0; font-size: 36px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
+            ⚠️ WARNING! ⚠️
+          </h2>
+          <h3 style="color: #FFFFFF; margin: 0 0 20px 0; font-size: 24px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
+            EARLY END STAKE PENALTY!
+          </h3>
+          <p style="color: #FFFFFF; font-size: 18px; margin: 10px 0; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
+            This stake is only ${percentComplete}% complete!
+          </p>
+          <p style="color: #FFFF00; font-size: 20px; margin: 10px 0; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
+            ${daysRemaining} days remaining
+          </p>
+          <p style="color: #FFFFFF; font-size: 16px; margin: 20px 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
+            Ending early will result in SIGNIFICANT PENALTIES!
+          </p>
+          <div style="margin-top: 30px;">
+            <button onclick="document.getElementById('earlyEndWarning').remove(); document.getElementById('earlyEndWarningOverlay').remove()" style="
+              background: #00FF00;
+              color: #000000;
+              border: none;
+              padding: 15px 30px;
+              font-size: 18px;
+              font-weight: bold;
+              border-radius: 5px;
+              cursor: pointer;
+              margin: 0 10px;
+              box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            ">
+              CANCEL - Keep Stake
+            </button>
+            <button onclick="window.proceedWithEndStake()" style="
+              background: #8B0000;
+              color: #FFFFFF;
+              border: 2px solid #FF0000;
+              padding: 15px 30px;
+              font-size: 18px;
+              font-weight: bold;
+              border-radius: 5px;
+              cursor: pointer;
+              margin: 0 10px;
+              box-shadow: 0 0 20px rgba(139, 0, 0, 0.5);
+            ">
+              END ANYWAY
+            </button>
+          </div>
+        </div>
+        <div id="earlyEndWarningOverlay" style="
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.8);
+          z-index: 9999;
+        " onclick="document.getElementById('earlyEndWarning').remove(); document.getElementById('earlyEndWarningOverlay').remove()"></div>
+      `;
+      
+      // Add the warning to the page
+      $('body').append(warningHtml);
+      
+      // Define the proceed function
+      window.proceedWithEndStake = async () => {
+        document.getElementById('earlyEndWarning').remove();
+        document.getElementById('earlyEndWarningOverlay').remove();
+        window.proceedWithNormalEndStake();
+      };
+    } else {
+      // Stake is mature, proceed normally
+      window.proceedWithNormalEndStake();
     }
   });
 }
@@ -545,7 +861,6 @@ async function returnHXR(stakeIndex, rawEarlyReward) {
 
 async function endStake(stakeIndex, stakeId) {
   try {
-    const hexContractAddress = '0x2b591e99afe9f32eaa6214f7b7629768c40eeb39';
     const hexAbi = await loadHexABI();
     if (!hexAbi) {
       alert('Failed to load Hex ABI');
@@ -711,7 +1026,7 @@ async function addTokenToMetaMask() {
 
 async function addHexTokenToMetaMask() {
   try {
-    const tokenAddress = '0x2b591e99afE9f32eAA6214f7B7629768c40Eeb39';
+    const tokenAddress = hexContractAddress;
     const tokenSymbol = 'HEX';
     const tokenDecimals = 8;
     const tokenImage = './HEXagon.png';
